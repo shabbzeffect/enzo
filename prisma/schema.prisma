@@ -1,0 +1,325 @@
+// prisma/schema.prisma
+//
+// Nyumba Edit data model.
+//
+// NOTE: This schema defines the production database approach (PostgreSQL via Prisma).
+// The public UI currently runs against clearly-marked demo data in
+// src/lib/data/demo.ts so the site works without any database credentials.
+// To use this schema in production, set DATABASE_URL in .env, run
+// `npx prisma migrate deploy` and `npx prisma db seed`, then swap the data
+// layer in src/lib/data/demo.ts for database-backed repository functions.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth / access control
+// ---------------------------------------------------------------------------
+
+model Role {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  users     User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String?  // optional; magic-link / OTP auth may not store passwords
+  name          String?
+  roleId        String
+  role          Role     @relation(fields: [roleId], references: [id])
+  emailVerified DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([email])
+  @@index([roleId])
+}
+
+// ---------------------------------------------------------------------------
+// Geography (Kenya) — all 47 counties to be seeded
+// ---------------------------------------------------------------------------
+
+model County {
+  id      String   @id @default(cuid())
+  code    String   @unique // official county code, e.g. "01" Nairobi
+  name    String   @unique
+  towns   Town[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([code])
+  @@index([name])
+}
+
+model Town {
+  id       String   @id @default(cuid())
+  slug     String   @unique
+  name     String
+  countyId String
+  county   County   @relation(fields: [countyId], references: [id])
+  areas    Area[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([countyId, name])
+}
+
+model Area {
+  id      String   @id @default(cuid())
+  slug    String   @unique
+  name    String
+  townId  String
+  town    Town     @relation(fields: [townId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([townId, name])
+}
+
+// ---------------------------------------------------------------------------
+// Product categories
+// ---------------------------------------------------------------------------
+
+model Category {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  image       String?  // placeholder or asset id
+  count       Int      @default(0)
+  products    Product[]
+  retailers   RetailerCategory[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([slug])
+  @@index([name])
+}
+
+model RetailerCategory {
+  retailerId  String
+  retailer    Retailer @relation(fields: [retailerId], references: [id])
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@id([retailerId, categoryId])
+}
+
+// ---------------------------------------------------------------------------
+// Retailers
+// ---------------------------------------------------------------------------
+
+model Retailer {
+  id               String      @id @default(cuid())
+  slug             String      @unique
+  name             String
+  description      String?
+  shortDescription String?
+  logo             String?     // placeholder or asset id
+  cover            String?     // placeholder or asset id
+  countyId         String
+  county           County      @relation(fields: [countyId], references: [id])
+  townId           String
+  town             Town        @relation(fields: [townId], references: [id])
+  areaId           String?
+  area             Area?       @relation(fields: [areaId], references: [id])
+  serviceAreas     String[]    // county names the retailer delivers to
+  phone            String      // +254 format
+  whatsapp         String      // +254 format
+  email            String?
+  website          String?
+  instagram        String?
+  facebook         String?
+  tiktok           String?
+  verified         Boolean     @default(false) // only true with a real verification process
+  showroom         Boolean     @default(false)
+  onlineOnly       Boolean     @default(false)
+  madeInKenya      Boolean     @default(false)
+  delivery         Boolean     @default(false)
+  assembly         Boolean     @default(false)
+  customization    Boolean     @default(false)
+  priceConfirmed   Boolean     @default(false)
+  priceLastChecked DateTime?
+  paymentMethods   String[]    // e.g. ["M-Pesa", "Cash", "Card"]
+  sponsored        Boolean     @default(false)
+  sponsorLabel     String?     // "Sponsored" | "Featured Partner"
+  products         Product[]
+  enquiries        Enquiry[]
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  @@index([slug])
+  @@index([countyId])
+  @@index([townId])
+  @@index([sponsored])
+}
+
+// ---------------------------------------------------------------------------
+// Products
+// ---------------------------------------------------------------------------
+
+model Product {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  description      String?
+  categoryId       String
+  category         Category @relation(fields: [categoryId], references: [id])
+  retailerId       String
+  retailer         Retailer @relation(fields: [retailerId], references: [id])
+  priceKes         Int?     // null = price on request
+  priceOnRequest   Boolean  @default(false)
+  widthCm          Int?
+  depthCm          Int?
+  heightCm         Int?
+  materials        String[]
+  images           String[] // placeholder or asset ids
+  availability     String   @default("unknown") // in-stock | made-to-order | unavailable | unknown
+  delivery         Boolean  @default(false)
+  assembly         Boolean  @default(false)
+  customization    Boolean  @default(false)
+  deliveryNotes    String?
+  priceLastChecked DateTime
+  priceConfirmed   Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([retailerId])
+  @@index([priceKes])
+  @@index([availability])
+}
+
+// ---------------------------------------------------------------------------
+// Articles / editorial
+// ---------------------------------------------------------------------------
+
+model Article {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  title            String
+  excerpt          String?
+  body             String?
+  authorId         String?
+  author           User?    @relation(fields: [authorId], references: [id])
+  publishedAt      DateTime
+  updatedAt        DateTime @updatedAt
+  image            String?
+  category         String?  // e.g. "guides", "maker-stories"
+  relatedProducts  String[] // product slugs
+  relatedRetailers String[] // retailer slugs
+  disclosure       String?  // commercial relationship disclosure, if any
+  sponsored        Boolean  @default(false)
+  sponsorLabel     String?  // "Sponsored" | "Featured Partner"
+  createdAt        DateTime @default(now())
+
+  @@index([slug])
+  @@index([publishedAt])
+  @@index([sponsored])
+}
+
+// ---------------------------------------------------------------------------
+// Promotions / sponsored placements
+// ---------------------------------------------------------------------------
+
+model Promotion {
+  id          String   @id @default(cuid())
+  type        String   // "retailer" | "product"
+  targetId    String
+  targetSlug  String
+  placement   String   // e.g. "homepage-hero" | "search-top" | "category-banner"
+  label       String   // "Sponsored" | "Featured Partner"
+  startDate   DateTime
+  endDate     DateTime
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([startDate, endDate])
+}
+
+// ---------------------------------------------------------------------------
+// Consumer enquiries (retailer contact requests)
+// ---------------------------------------------------------------------------
+
+model Enquiry {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String   // +254 format
+  email       String?
+  message     String
+  retailerId  String?
+  retailer    Retailer? @relation(fields: [retailerId], references: [id])
+  productId   String?
+  product     Product? @relation(fields: [productId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([retailerId])
+}
+
+// ---------------------------------------------------------------------------
+// Future-work models (documented, not wired to UI in MVP)
+// ---------------------------------------------------------------------------
+
+// Reviews & ratings — only to be enabled once a real verification process exists.
+model Review {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  authorName  String
+  rating      Int
+  title       String?
+  body        String?
+  verifiedPurchase Boolean @default(false)
+  approved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+// Advertising campaigns & slots — plumbing for future monetisation.
+model AdSlot {
+  id       String   @id @default(cuid())
+  name     String
+  location String   // e.g. "homepage-hero" | "sidebar"
+  active   Boolean  @default(true)
+  campaigns AdCampaign[]
+}
+
+model AdCampaign {
+  id        String   @id @default(cuid())
+  adSlotId  String
+  adSlot    AdSlot @relation(fields: [adSlotId], references: [id])
+  retailerId String?
+  retailer  Retailer? @relation(fields: [retailerId], references: [id])
+  label     String   // "Sponsored" | "Featured Partner"
+  startDate DateTime
+  endDate   DateTime
+  active    Boolean  @default(true)
+}
+
+// Audit log for admin actions.
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+}
