@@ -48,3 +48,49 @@ export function CardContent({ className, children, ...props }: CardContentProps)
     </div>
   );
 }
+
+export type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+
+export function CardHeader({ className, children, ...props }: CardHeaderProps) {
+  return (
+    <div className={["flex flex-col space-y-1.5 p-4", className].filter(Boolean).join(" ")} {...props}>
+      {children}
+    </div>
+  );
+}
+
+export type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement>;
+
+export function CardTitle({ className, children, ...props }: CardTitleProps) {
+  return (
+    <h3
+      className={["font-heading font-bold text-foreground text-lg", className].filter(Boolean).join(" ")}
+      {...props}
+    >
+      {children}
+    </h3>
+  );
+}
+
+export type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
+
+export function CardDescription({ className, children, ...props }: CardDescriptionProps) {
+  return (
+    <p
+      className={["text-sm text-muted-foreground", className].filter(Boolean).join(" ")}
+      {...props}
+    >
+      {children}
+    </p>
+  );
+}
+
+export type CardFooterProps = React.HTMLAttributes<HTMLDivElement>;
+
+export function CardFooter({ className, children, ...props }: CardFooterProps) {
+  return (
+    <div className={["flex items-center pt-4 border-t border-border", className].filter(Boolean).join(" ")} {...props}>
+      {children}
+    </div>
+  );
+}

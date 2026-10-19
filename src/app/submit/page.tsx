@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { submitRetailerRequest, type SubmissionErrors } from "@/app/submit/actions";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input, Select, Textarea, Checkbox } from "@/components/ui/form";
+import { submitRetailerRequest, type SubmissionErrors } from "@/app/submit/actions";
 
 const CATEGORY_LABELS: Record<string, string> = {
   sofas: "Sofas & Living",
@@ -45,46 +47,51 @@ export default function SubmitPage() {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-border bg-white p-6 md:p-8 shadow-sm">
-        {state.message && (
-          <div
-            className={[
-              "rounded-xl p-4 text-sm",
-              state.ok ? "border-green-200 bg-green-50 text-green-800" : "border-terracotta-200 bg-terracotta-50 text-terracotta-800",
-            ].join(" ")}
-          >
-            {state.message}
-          </div>
-        )}
+      {state.message && (
+        <div
+          className={[
+            "rounded-xl p-4 text-sm transition-colors",
+            state.ok
+              ? "border-success-200 bg-success-50 text-success-800"
+              : "border-tertiary-200 bg-tertiary-50 text-tertiary-800",
+          ].join(" ")}
+        >
+          {state.message}
+        </div>
+      )}
 
+      <Card className="rounded-2xl border border-border shadow-sm p-6 md:p-8">
         <form action={handleSubmit} className="space-y-6" id="listing-form">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field
+            <Input
               label="Your name"
               id="name"
+              placeholder="Asha Njeri"
               error={state.errors?.name}
               required
             />
-            <Field
+            <Input
               label="Business name"
               id="businessName"
+              placeholder="Asha's Furniture"
               error={state.errors?.businessName}
               required
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field
+            <Select
               label="County"
               id="county"
-              type="select"
               error={state.errors?.county}
               required
             >
               <option value="">Select a county</option>
-              {COUNTIES.map((c) => (<option key={c} value={c}>{c}</option>))}
-            </Field>
-            <Field
+              {COUNTIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </Select>
+            <Input
               label="Town / area"
               id="town"
               placeholder="e.g. Karen, Nyali, Milimani"
@@ -94,7 +101,7 @@ export default function SubmitPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field
+            <Input
               label="Phone (+254)"
               id="phone"
               type="tel"
@@ -102,7 +109,7 @@ export default function SubmitPage() {
               error={state.errors?.phone}
               required
             />
-            <Field
+            <Input
               label="Email (optional)"
               id="email"
               type="email"
@@ -111,7 +118,7 @@ export default function SubmitPage() {
             />
           </div>
 
-          <Field
+          <Input
             label="Website (optional)"
             id="website"
             type="url"
@@ -120,7 +127,7 @@ export default function SubmitPage() {
           />
 
           <div className="space-y-3">
-            <label className="text-sm font-semibold text-ink block">Product categories</label>
+            <label className="text-sm font-semibold text-foreground block">Product categories</label>
             <p className="text-xs text-muted">Select the categories your business sells.</p>
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
@@ -129,21 +136,20 @@ export default function SubmitPage() {
                     type="checkbox"
                     name="categories"
                     value={key}
-                    className="rounded border-green-800 text-green-800 focus:ring-green-800"
+                    className="rounded border-primary text-primary focus:ring-primary"
                   />
-                  <span className="text-ink">{label}</span>
+                  <span className="text-foreground">{label}</span>
                 </label>
               ))}
             </div>
             {state.errors?.categories && (
-              <p className="text-xs text-terracotta-700">{state.errors.categories}</p>
+              <p className="text-xs text-tertiary">{state.errors.categories}</p>
             )}
           </div>
 
-          <Field
+          <Textarea
             label="Tell us about your business"
             id="message"
-            type="textarea"
             rows={4}
             placeholder="What do you make or sell? Where are you located? Do you offer delivery, assembly or customisation?"
             error={state.errors?.message}
@@ -151,20 +157,19 @@ export default function SubmitPage() {
           />
 
           <div className="flex items-start gap-3">
-            <input
+            <Checkbox
               id="terms"
-              name="terms"
-              type="checkbox"
-              className="mt-0.5 rounded border-green-800 text-green-800 focus:ring-green-800"
+              label={
+                <>
+                  I understand that submitting this form does not guarantee publication
+                  or a verified badge. All listings are reviewed by our editorial team.
+                </>
+              }
               required
             />
-            <label className="text-sm text-ink leading-relaxed" htmlFor="terms">
-              I understand that submitting this form does not guarantee publication
-              or a verified badge. All listings are reviewed by our editorial team.
-            </label>
           </div>
           {state.errors?.terms && (
-            <p className="text-xs text-terracotta-700">{state.errors.terms}</p>
+            <p className="text-xs text-tertiary">{state.errors.terms}</p>
           )}
 
           <div className="pt-4">
@@ -173,10 +178,10 @@ export default function SubmitPage() {
             </Button>
           </div>
         </form>
-      </div>
+      </Card>
 
       <div className="bg-cream-50 rounded-xl border border-border p-6">
-        <h3 className="font-bold text-ink mb-2">What happens next?</h3>
+        <h3 className="font-bold text-foreground mb-2">What happens next?</h3>
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
           <li>Our editorial team reviews your request within a few business days.</li>
           <li>If accepted, we’ll contact you to confirm details and publish your profile.</li>
@@ -187,60 +192,10 @@ export default function SubmitPage() {
   );
 }
 
-function Field({
-  label,
-  id,
-  type = "text",
-  placeholder,
-  error,
-  required = false,
-  rows,
-  children,
-}: {
-  label: string;
-  id: string;
-  type?: string;
-  placeholder?: string;
-  error?: string;
-  required?: boolean;
-  rows?: number;
-  children?: React.ReactNode;
-}) {
+function Card({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-semibold text-ink block" htmlFor={id}>
-        {label}{required ? <span className="text-terracotta-700 ml-1" aria-hidden="true">*</span> : null}
-      </label>
-      {type === "select" || type === "textarea" ? (
-        children === undefined ? (
-          <select
-            id={id}
-            name={id}
-            className="w-full rounded-xl border border-border bg-white px-3 py-2 text-ink focus-visible-ring"
-            required={required}
-          >
-            {children}
-          </select>
-        ) : (
-          <textarea
-            id={id}
-            name={id}
-            rows={rows}
-            className="w-full rounded-xl border border-border bg-white px-3 py-2 text-ink focus-visible-ring"
-            required={required}
-          />
-        )
-      ) : (
-          <input
-            id={id}
-            name={id}
-            type={type}
-            placeholder={placeholder}
-            className="w-full rounded-xl border border-border bg-white px-3 py-2 text-ink focus-visible-ring"
-            required={required}
-          />
-      )}
-      {error && <p className="text-xs text-terracotta-700">{error}</p>}
+    <div className={["rounded-2xl border border-border bg-white shadow-sm p-6 md:p-8", className].filter(Boolean).join(" ")}>
+      {children}
     </div>
   );
 }

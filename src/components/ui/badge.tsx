@@ -3,7 +3,7 @@
 import * as React from "react";
 
 export type BadgeProps = React.HTMLAttributes<HTMLSpanElement> & {
-  variant?: "default" | "green" | "terracotta" | "subtle" | "sponsor";
+  variant?: "default" | "green" | "tertiary" | "subtle" | "sponsor" | "success" | "warning";
 };
 
 export function Badge({
@@ -16,11 +16,11 @@ export function Badge({
   const variants: Record<string, string> = {
     default: "border-border bg-white text-ink",
     green: "border-green-200/60 bg-green-50 text-green-800",
-    terracotta:
-      "border-terracotta-200/60 bg-terracotta-50 text-terracotta-800",
+    tertiary: "border-tertiary-200/60 bg-tertiary-50 text-tertiary-800",
     subtle: "border-border bg-cream-100 text-muted",
-    sponsor:
-      "border-terracotta-300 bg-terracotta-100 text-terracotta-800",
+    sponsor: "border-tertiary-300 bg-tertiary-100 text-tertiary-800",
+    success: "border-success-200/60 bg-success-50 text-success-800",
+    warning: "border-warning-200/60 bg-warning-50 text-warning-800",
   };
 
   return (

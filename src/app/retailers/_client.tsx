@@ -4,9 +4,10 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { searchRetailersDemo, COUNTIES, CATEGORIES } from "@/app/retailers/actions";
-import { Card, CardImage } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge, SponsorLabel } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input, Select } from "@/components/ui/form";
 import { WhatsAppButton } from "@/components/ui/whatsapp";
 
 export default function RetailersClient() {
@@ -55,54 +56,59 @@ export default function RetailersClient() {
     <div className="space-y-8">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="font-heading text-2xl md:text-3xl font-bold">Retailer directory</h1>
+          <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Retailer directory</h1>
           <p className="text-muted text-sm">Find furniture and homeware retailers across Kenyan counties.</p>
         </div>
         <Button onClick={() => setOpenFilter(true)} className="hidden lg:inline-flex">Filters</Button>
       </div>
 
-      <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const form = new FormData(e.currentTarget);
-            const p: any = {
-              q: (form.get("q") as string) || "",
-              county: (form.get("county") as string) || "",
-              category: (form.get("category") as string) || "",
-            };
-            setFilters(p);
-            nav(p);
-          }}
-          className="grid grid-cols-1 lg:grid-cols-4 gap-4"
-        >
-          <label className="sr-only">Search retailers</label>
-          <input
-            name="q"
-            defaultValue={filters.q}
-            className="rounded-xl border border-border bg-white px-4 py-3 text-ink placeholder:text-muted focus-visible-ring"
-            placeholder="Search retailers by name or town…"
-          />
-          <label className="sr-only">County</label>
-          <select name="county" defaultValue={filters.county} className="rounded-xl border border-border bg-white px-4 py-3 text-ink focus-visible-ring">
-            <option value="">All counties</option>
-            {COUNTIES.map((c) => (
-              <option key={c.code} value={c.name}>{c.name}</option>
-            ))}
-          </select>
-          <label className="sr-only">Category</label>
-          <select name="category" defaultValue={filters.category} className="rounded-xl border border-border bg-white px-4 py-3 text-ink focus-visible-ring">
-            <option value="">All categories</option>
-            {CATEGORIES.map((c) => (
-              <option key={c.slug} value={c.slug}>{c.name}</option>
-            ))}
-          </select>
-          <Button type="submit" className="w-full">Search</Button>
-        </form>
-      </div>
+      <Card className="rounded-2xl border border-border shadow-sm p-5">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const form = new FormData(e.currentTarget);
+              const p: any = {
+                q: (form.get("q") as string) || "",
+                county: (form.get("county") as string) || "",
+                category: (form.get("category") as string) || "",
+              };
+              setFilters(p);
+              nav(p);
+            }}
+            className="grid grid-cols-1 lg:grid-cols-4 gap-4"
+          >
+            <Input
+              label="Search retailers"
+              name="q"
+              defaultValue={filters.q}
+              placeholder="Search retailers by name or town…"
+            />
+            <Select
+              label="County"
+              name="county"
+              defaultValue={filters.county}
+            >
+              <option value="">All counties</option>
+              {COUNTIES.map((c) => (
+                <option key={c.code} value={c.name}>{c.name}</option>
+              ))}
+            </Select>
+            <Select
+              label="Category"
+              name="category"
+              defaultValue={filters.category}
+            >
+              <option value="">All categories</option>
+              {CATEGORIES.map((c) => (
+                <option key={c.slug} value={c.slug}>{c.name}</option>
+              ))}
+            </Select>
+            <Button type="submit" className="w-full">Search</Button>
+          </form>
+        </Card>
 
-      <div className="flex items-center gap-4 mb-4">
-        <span className="text-sm font-semibold text-ink">{count} retailer{count !== 1 ? "s" : ""}</span>
+        <div className="flex items-center gap-4 mb-4">
+          <span className="text-sm font-semibold text-foreground">{count} retailer{count !== 1 ? "s" : ""}</span>
       </div>
 
       {isPending && <div className="py-16 text-center text-muted">Loading retailers…</div>}
@@ -176,14 +182,18 @@ export default function RetailersClient() {
 
 function RetailerCard({ r }: { r: any }) {
   return (
-    <Card className="flex flex-col h-full group hover:border-green-800/60 transition-colors focus-visible-ring">
+    <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
       {r.sponsored && <SponsorLabel className="absolute top-4 left-4 z-10">{r.sponsorLabel}</SponsorLabel>}
-      <CardImage src={r.cover} alt={r.name} height={200} />
+      <div className="relative h-40 overflow-hidden rounded-lg bg-cream-100">
+        <span className="image-placeholder absolute inset-0 flex items-center justify-center text-[0.75rem] font-medium uppercase tracking-wider">
+          {r.name}
+        </span>
+      </div>
       <div className="p-4 flex-1 flex flex-col">
-        <h3 className="font-heading font-bold text-ink line-clamp-1 mb-2 group-hover:text-green-800 transition-colors">{r.name}</h3>
+        <h3 className="font-heading font-bold text-foreground line-clamp-1 mb-2 group-hover:text-primary transition-colors">{r.name}</h3>
         <p className="text-sm text-muted line-clamp-2 mb-3 flex-1">{r.shortDescription}</p>
         <div className="mt-auto pt-4 border-t border-border flex items-center justify-between">
-          <span className="text-xs font-semibold text-ink">{r.town}, {r.county}</span>
+          <span className="text-xs font-semibold text-foreground">{r.town}, {r.county}</span>
           <WhatsAppButton phone={r.whatsapp} size="sm" label="Message" />
         </div>
       </div>

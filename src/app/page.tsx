@@ -179,7 +179,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="font-heading font-bold text-ink">{retailer.name}</h3>
                   {retailer.sponsored && (
-                    <Badge variant="terracotta" className="ml-auto text-[0.6rem] uppercase tracking-wider">
+                    <Badge variant="tertiary" className="ml-auto text-[0.6rem] uppercase tracking-wider">
                       Featured Partner
                     </Badge>
                   )}

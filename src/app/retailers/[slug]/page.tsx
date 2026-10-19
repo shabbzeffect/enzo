@@ -54,7 +54,7 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
       <section>
         <div className="rounded-2xl border border-border overflow-hidden bg-white">
           <CardImage src={retailer.cover} alt={`${retailer.name} cover`} height={300} />
-          {retailer.sponsored && <Badge variant="terracotta" className="absolute top-4 left-4 z-10">{retailer.sponsorLabel}</Badge>}
+          {retailer.sponsored &&             <Badge variant="tertiary" className="absolute top-4 left-4 z-10">{retailer.sponsorLabel}</Badge>}
           <div className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
               <div>

@@ -31,7 +31,7 @@ export function Price({
   }
 
   return (
-    <span className={[sizes[size], weight, "text-ink", className].filter(Boolean).join(" ")}>
+    <span className={[sizes[size], weight, "text-foreground", className].filter(Boolean).join(" ")}>
       KSh {amount.toLocaleString("en-KE")}
     </span>
   );

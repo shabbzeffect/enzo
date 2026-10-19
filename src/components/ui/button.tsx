@@ -3,7 +3,7 @@
 import * as React from "react";
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "terracotta";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "tertiary" | "destructive";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   asChild?: boolean;
@@ -20,29 +20,25 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-xl font-semibold text-sm transition-colors focus-visible-ring disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex items-center justify-center gap-2 rounded-xl font-semibold text-sm transition-colors focus-visible-ring disabled:opacity-60 disabled:pointer-events-none";
   const variants: Record<string, string> = {
     primary:
-      "bg-green-800 text-white hover:bg-green-700 focus-visible:ring-green-600",
+      "bg-primary text-primary-foreground hover:bg-primary-hover focus-visible:ring-ring",
     secondary:
-      "bg-terracotta-700 text-white hover:bg-terracotta-600 focus-visible:ring-terracotta-600",
+      "bg-secondary text-secondary-foreground hover:bg-muted-foreground/10 focus-visible:ring-ring",
     outline:
-      "border border-border bg-transparent text-ink hover:bg-cream-100 focus-visible:ring-ring",
+      "border border-border bg-transparent text-foreground hover:bg-muted focus-visible:ring-ring",
     ghost:
-      "bg-transparent text-ink hover:bg-cream-100 focus-visible:ring-ring",
-    terracotta:
-      "bg-terracotta-800 text-white hover:bg-terracotta-700 focus-visible:ring-terracotta-600",
+      "bg-transparent text-foreground hover:bg-muted focus-visible:ring-ring",
+    tertiary:
+      "bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover focus-visible:ring-ring",
+    destructive:
+      "bg-destructive text-destructive-foreground hover:bg-destructive focus-visible:ring-ring",
   };
   const sizes: Record<string, string> = {
     sm: "px-3 py-1.5 text-xs",
     md: "px-4 py-2",
     lg: "px-5 py-2.5 text-base",
-  };
-
-  const buttonProps = {
-    className: [base, variants[variant], sizes[size], className].filter(Boolean).join(" "),
-    disabled: disabled || isLoading,
-    ...props,
   };
 
   const spinner = isLoading ? (
@@ -62,6 +58,12 @@ export function Button({
       </svg>
     </span>
   ) : null;
+
+  const buttonProps = {
+    className: [base, variants[variant], sizes[size], className].filter(Boolean).join(" "),
+    disabled: disabled || isLoading,
+    ...props,
+  };
 
   if (asChild) {
     const child = children as unknown as React.ReactElement<any>;

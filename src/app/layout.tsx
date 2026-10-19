@@ -3,6 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
+import { ThemeProvider } from "@/components/ui/theme";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -43,18 +44,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="font-sans antialiased">
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <JsonLd type="Organization" data={SITE.organizationJsonLd?.()} />
-        <Navbar />
-        <main id="main-content" tabIndex={-1} role="main">
-          {children}
-        </main>
-        <Footer />
-      </body>
-    </html>
+    <ThemeProvider>
+      <html lang="en">
+        <body className="font-sans antialiased">
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
+          <JsonLd type="Organization" data={SITE.organizationJsonLd?.()} />
+          <Navbar />
+          <main id="main-content" tabIndex={-1} role="main">
+            {children}
+          </main>
+          <Footer />
+        </body>
+      </html>
+    </ThemeProvider>
   );
 }

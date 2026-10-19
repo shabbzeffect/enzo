@@ -4,10 +4,11 @@ import { useEffect, useState, useTransition, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { searchDemo, CATEGORIES, COUNTIES, type SearchParams } from "@/app/discover/actions";
-import { Card, CardImage } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge, SponsorLabel } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
+import { Input, Select } from "@/components/ui/form";
 import { WhatsAppButton } from "@/components/ui/whatsapp";
 
 type Result = { type: string; item: any };
@@ -134,35 +135,32 @@ export default function DiscoverClient() {
             }}
             className="grid grid-cols-1 sm:grid-cols-4 gap-4 p-5"
           >
-            <label className="sr-only">Search</label>
-            <input
+            <Input
+              label="Search"
               name="q"
               defaultValue={filters.q}
-              className="rounded-xl border border-border bg-white px-4 py-3 text-ink placeholder:text-muted focus-visible-ring"
               placeholder="Search furniture, retailers or guides…"
             />
-            <label className="sr-only">Category</label>
-            <select
+            <Select
+              label="Category"
               name="category"
               defaultValue={filters.category}
-              className="rounded-xl border border-border bg-white px-4 py-3 text-ink focus-visible-ring"
             >
               <option value="">All categories</option>
               {CATEGORIES.map((c) => (
                 <option key={c.slug} value={c.slug}>{c.name}</option>
               ))}
-            </select>
-            <label className="sr-only">County</label>
-            <select
+            </Select>
+            <Select
+              label="County"
               name="county"
               defaultValue={filters.county}
-              className="rounded-xl border border-border bg-white px-4 py-3 text-ink focus-visible-ring"
             >
               <option value="">All locations</option>
               {COUNTIES.map((c) => (
                 <option key={c.code} value={c.name}>{c.name}</option>
               ))}
-            </select>
+            </Select>
             <Button type="submit" className="w-full">Search</Button>
           </form>
         </Card>
@@ -402,23 +400,27 @@ export default function DiscoverClient() {
 function ProductCard({ p }: { p: any }) {
   const retailer = p.retailerName;
   return (
-    <Card className="flex flex-col h-full group hover:border-green-800/60 transition-colors focus-visible-ring">
-      <CardImage src={p.images?.[0] || "placeholder:product"} alt={p.name} height={220} />
+    <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
+      <div className="relative h-48 overflow-hidden rounded-lg bg-cream-100">
+        <span className="image-placeholder absolute inset-0 flex items-center justify-center text-[0.75rem] font-medium uppercase tracking-wider">
+          {p.name}
+        </span>
+      </div>
       <div className="p-4 flex-1 flex flex-col">
         {p.sponsored && <SponsorLabel className="mb-3">{p.sponsorLabel || "Sponsored"}</SponsorLabel>}
-        <h3 className="font-heading font-bold text-ink line-clamp-1 mb-2 group-hover:text-green-800 transition-colors">
+        <h3 className="font-heading font-bold text-foreground line-clamp-1 mb-2 group-hover:text-primary transition-colors">
           {p.name}
         </h3>
         <p className="text-sm text-muted line-clamp-2 mb-3 flex-1">{p.description}</p>
         <div className="flex items-baseline gap-2 mb-3">
           <Price amount={p.priceKes} onRequest={p.priceOnRequest} size="lg" />
-          {!p.priceConfirmed && <span className="text-xs text-terracotta-700 font-semibold">Price may be outdated</span>}
+          {!p.priceConfirmed && <span className="text-xs text-warning font-semibold">Price may be outdated</span>}
         </div>
         <div className="flex items-center gap-2 text-xs text-muted mb-3">
           {p.availability === "in-stock" && <span className="flex items-center gap-1">In stock</span>}
           <span>{retailer}</span>
         </div>
-        <Link href={`/products/${p.slug}`} className="mt-auto rounded-xl border border-border bg-white px-4 py-2 text-sm font-semibold text-green-800 hover:bg-cream-100 transition-colors focus-visible-ring text-center">
+        <Link href={`/products/${p.slug}`} className="mt-auto inline-flex items-center justify-center rounded-xl border border-border bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-cream-100 transition-colors focus-visible-ring w-full text-center">
           View product
         </Link>
       </div>
@@ -428,16 +430,20 @@ function ProductCard({ p }: { p: any }) {
 
 function RetailerCard({ r }: { r: any }) {
   return (
-    <Card className="flex flex-col h-full group hover:border-green-800/60 transition-colors focus-visible-ring">
+    <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
       {r.sponsored && <SponsorLabel className="absolute top-4 left-4 z-10">{r.sponsorLabel}</SponsorLabel>}
-      <CardImage src={r.cover} alt={r.name} height={200} />
+      <div className="relative h-40 overflow-hidden rounded-lg bg-cream-100">
+        <span className="image-placeholder absolute inset-0 flex items-center justify-center text-[0.75rem] font-medium uppercase tracking-wider">
+          {r.name}
+        </span>
+      </div>
       <div className="p-4 flex-1 flex flex-col">
-        <h3 className="font-heading font-bold text-ink line-clamp-1 mb-2 group-hover:text-green-800 transition-colors">
+        <h3 className="font-heading font-bold text-foreground line-clamp-1 mb-2 group-hover:text-primary transition-colors">
           {r.name}
         </h3>
         <p className="text-sm text-muted line-clamp-2 mb-3 flex-1">{r.shortDescription}</p>
         <div className="mt-auto pt-4 border-t border-border flex items-center justify-between">
-          <span className="text-xs font-semibold text-ink">{r.town}, {r.county}</span>
+          <span className="text-xs font-semibold text-foreground">{r.town}, {r.county}</span>
           <WhatsAppButton phone={r.whatsapp} size="sm" label="Message" />
         </div>
       </div>
@@ -459,9 +465,7 @@ function TabButton({
       onClick={onSelect}
       className={[
         "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
-        active
-          ? "border-green-800 text-green-800"
-          : "border-transparent text-muted hover:text-ink",
+        active ? "border-primary text-primary" : "border-transparent text-muted hover:text-foreground",
       ].join(" ")}
     >
       {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -471,16 +475,20 @@ function TabButton({
 
 function ArticleCard({ a }: { a: any }) {
   return (
-    <Card className="flex flex-col h-full group hover:border-green-800/60 transition-colors focus-visible-ring">
+    <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
       {a.sponsored && <SponsorLabel className="mb-3">{a.sponsorLabel || "Sponsored"}</SponsorLabel>}
-      <CardImage src={a.image} alt={a.title} height={200} />
+      <div className="relative h-40 overflow-hidden rounded-lg bg-cream-100">
+        <span className="image-placeholder absolute inset-0 flex items-center justify-center text-[0.75rem] font-medium uppercase tracking-wider">
+          {a.title}
+        </span>
+      </div>
       <div className="p-4 flex-1 flex flex-col">
         <span className="text-xs text-muted mb-2">{a.category}</span>
-        <h3 className="font-heading font-bold text-ink line-clamp-2 mb-2 group-hover:text-green-800 transition-colors">
+        <h3 className="font-heading font-bold text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors">
           {a.title}
         </h3>
         <p className="text-sm text-muted line-clamp-2 mb-3 flex-1">{a.excerpt}</p>
-        <Link href={`/guides/${a.slug}`} className="mt-auto inline-block rounded-xl border border-border bg-white px-4 py-2 text-sm font-semibold text-green-800 hover:bg-cream-100 transition-colors focus-visible-ring text-center">
+        <Link href={`/guides/${a.slug}`} className="mt-auto inline-flex items-center justify-center rounded-xl border border-border bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-cream-100 transition-colors focus-visible-ring w-full text-center">
           Read guide
         </Link>
       </div>
