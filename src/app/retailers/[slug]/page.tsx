@@ -6,6 +6,33 @@ import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
+import { SITE, absolutePath } from "@/lib/site";
+
+export const metadata = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const { slug } = await params;
+  const retailer = getRetailer(slug);
+  if (!retailer) {
+    return { title: "Retailer | Nyumba Edit" };
+  }
+  return {
+    title: `${retailer.name} | Nyumba Edit`,
+    description: retailer.shortDescription,
+    openGraph: {
+      title: retailer.name,
+      description: retailer.description || retailer.shortDescription,
+      type: "profile",
+      url: absolutePath(`/retailers/${slug}`),
+      images: [{ url: `${SITE.url}/images/placeholder:${retailer.cover}`, alt: retailer.name, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: retailer.name,
+      description: retailer.shortDescription,
+      images: [`${SITE.url}/images/placeholder:${retailer.cover}`],
+    },
+  };
+};
 
 export default async function RetailerProfilePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -16,6 +43,7 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
 
   return (
     <div className="space-y-12">
+      <JsonLd type="LocalBusiness" data={retailerJsonLd(retailer)} />
       <nav className="mb-2" aria-label="Breadcrumb">
         <ol className="flex flex-wrap gap-2 text-xs text-muted">
           <li><Link href="/retailers" className="hover:text-green-800 transition-colors">Retailer directory</Link></li>
@@ -142,4 +170,30 @@ function ProductCard({ p }: { p: any }) {
       </div>
     </Card>
   );
+}
+
+function retailerJsonLd(r: { id: string; slug: string; name: string; shortDescription: string | undefined; description: string | undefined; county: string; town: string; area?: string | undefined; phone: string; whatsapp: string; website?: string | undefined; instagram?: string | undefined; facebook?: string | undefined; tiktok?: string | undefined; cover: string }) {
+  return {
+    "@id": `${SITE.url}/retailers/${r.slug}#business`,
+    name: r.name,
+    description: r.shortDescription,
+    url: `${SITE.url}/retailers/${r.slug}`,
+    telephone: r.phone,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: r.area ? `${r.area}, ${r.town}` : r.town,
+      addressRegion: r.county,
+      addressCountry: "KE",
+    },
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        telephone: r.whatsapp,
+        contactType: "customer service",
+        availableLanguage: ["en", "sw"],
+      },
+    ],
+    sameAs: [r.website, r.instagram, r.facebook, r.tiktok].filter(Boolean),
+    image: `${SITE.url}/images/placeholder:${r.cover}`,
+  };
 }

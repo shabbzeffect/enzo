@@ -2,27 +2,37 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
+import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: {
     template: "%s | Nyumba Edit",
     default: "Nyumba Edit — Find furniture and home stores in Kenya",
   },
-  description:
-    "Nyumba Edit is an editorial furniture-discovery and retailer directory for Kenya. Browse products, shopping guides and interiors, and contact retailers directly. Prices in KSh.",
-  metadataBase: new URL(((process as unknown as { env: Record<string, string> }).env?.NEXT_PUBLIC_SITE_URL || "http://localhost:3000")),
+  description: SITE.description,
+  metadataBase: new URL(SITE.url),
   openGraph: {
-    siteName: "Nyumba Edit",
+    siteName: SITE.name,
     title: "Nyumba Edit — Find furniture and home stores in Kenya",
-    description:
-      "An editorial furniture-discovery and retailer directory for Kenya. Prices in KSh, dimensions in cm.",
+    description: SITE.description,
     type: "website",
     locale: "en-KE",
+    url: SITE.url,
+    images: [
+      {
+        url: "/images/og-default.svg",
+        width: 1200,
+        height: 630,
+        alt: "Nyumba Edit — furniture discovery for Kenya",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@nyumbaedit.demo",
-    creator: "@nyumbaedit.demo",
+    site: SITE.twitter,
+    creator: SITE.twitter,
+    images: ["/images/og-default.svg"],
   },
   robots: "index, follow",
 };
@@ -35,8 +45,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
+        <JsonLd type="Organization" data={SITE.organizationJsonLd?.()} />
         <Navbar />
-        <main>{children}</main>
+        <main id="main-content" tabIndex={-1} role="main">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

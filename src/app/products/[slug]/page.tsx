@@ -6,11 +6,35 @@ import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
 import Link from "next/link";
+import { JsonLd } from "@/components/json-ld";
+import { SITE, absolutePath } from "@/lib/site";
 
 export const metadata = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
+  const product = getProduct(slug);
+  if (!product) {
+    return { title: "Product | Nyumba Edit" };
+  }
+  const retailer = getRetailer(product.retailerSlug);
+  const priceText = product.priceKes === null ? "Price on request" : `KSh ${product.priceKes.toLocaleString("en-KE")}`;
+  const image = product.images?.[0] ? absolutePath(`/images/placeholder:${product.images[0]}`) : `${SITE.url}/images/og-default.svg`;
   return {
-    title: "Product | Nyumba Edit",
+    title: `${product.name} | Nyumba Edit`,
+    description: `${product.description} ${priceText}. Available from ${product.retailerName} in ${product.retailerSlug}.`,
+    openGraph: {
+      title: product.name,
+      description: product.description,
+      type: "product",
+      url: absolutePath(`/products/${slug}`),
+      images: [{ url: image, alt: product.name, width: 1200, height: 630 }],
+      price: { amount: product.priceKes ?? 0, currencyCode: "KES" },
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: product.description,
+      images: [image],
+    },
   };
 };
 
@@ -22,6 +46,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="space-y-12">
+      <JsonLd type="Product" data={productJsonLd(product)} />
       <nav className="mb-2" aria-label="Breadcrumb">
         <ol className="flex flex-wrap gap-2 text-xs text-muted">
           <li><Link href="/discover" className="hover:text-green-800 transition-colors">Discover</Link></li>
@@ -175,4 +200,26 @@ function RelatedProductCard({ p }: { p: { id: string; slug: string; name: string
       </div>
     </Card>
   );
+}
+
+function productJsonLd(p: typeof PRODUCTS[number]) {
+  const image = p.images?.[0] ? `${SITE.url}/images/placeholder:${p.images[0]}` : `${SITE.url}/images/og-default.svg`;
+  return {
+    "@id": `${SITE.url}/products/${p.slug}#product`,
+    name: p.name,
+    description: p.description,
+    image: image,
+    brand: { "@type": "Brand", name: p.retailerName },
+    offers: {
+      "@type": "Offer",
+      url: `${SITE.url}/products/${p.slug}`,
+      priceCurrency: "KES",
+      price: p.priceKes ?? null,
+      priceValidUntil: p.priceLastChecked,
+      availability: p.availability === "in-stock" ? "https://schema.org/InStock" : "https://schema.org/MadeToOrder",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+    category: p.category,
+    additionalProperty: p.materials.map((m) => ({ "@type": "PropertyValue", name: "material", value: m })),
+  };
 }

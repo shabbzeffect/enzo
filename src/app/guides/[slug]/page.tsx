@@ -5,6 +5,36 @@ import { Card, CardImage } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/json-ld";
+import { SITE, absolutePath } from "@/lib/site";
+
+export const metadata = async ({ params }: { params: Promise<{ slug: string }> }) => {
+  const { slug } = await params;
+  const article = getArticle(slug);
+  if (!article) {
+    return { title: "Guide | Nyumba Edit" };
+  }
+  return {
+    title: `${article.title} | Nyumba Edit`,
+    description: article.excerpt,
+    openGraph: {
+      title: article.title,
+      description: article.excerpt,
+      type: "article",
+      url: absolutePath(`/guides/${slug}`),
+      publishedTime: article.publishedAt,
+      modifiedTime: article.updatedAt || article.publishedAt,
+      authors: [article.author],
+      images: [{ url: `${SITE.url}/images/placeholder:${article.image}`, alt: article.title, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+      images: [`${SITE.url}/images/placeholder:${article.image}`],
+    },
+  };
+};
 
 export default async function GuidePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -13,6 +43,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
 
   return (
     <div className="space-y-10">
+      <JsonLd type="Article" data={articleJsonLd(article)} />
       <nav className="mb-2" aria-label="Breadcrumb">
         <ol className="flex flex-wrap gap-2 text-xs text-muted">
           <li><Link href="/guides" className="hover:text-green-800 transition-colors">Guides</Link></li>
@@ -66,4 +97,26 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
       </article>
     </div>
   );
+}
+
+function articleJsonLd(a: { id: string; slug: string; title: string; excerpt: string | undefined; body: string | undefined; author: string; publishedAt: string; updatedAt?: string | undefined; image: string }) {
+  return {
+    "@id": `${SITE.url}/guides/${a.slug}#article`,
+    headline: a.title,
+    description: a.excerpt,
+    articleBody: a.body,
+    author: { "@type": "Person", name: a.author },
+    publisher: {
+      "@type": "Organization",
+      name: SITE.name,
+      logo: { "@type": "ImageObject", url: `${SITE.url}/images/og-default.svg` },
+    },
+    datePublished: a.publishedAt,
+    dateModified: a.updatedAt || a.publishedAt,
+    image: `${SITE.url}/images/placeholder:${a.image}`,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE.url}/guides/${a.slug}`,
+    },
+  };
 }
