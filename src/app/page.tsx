@@ -19,6 +19,7 @@ const ACTIVE_PROMOTIONS = PROMOTIONS.filter((p) => p.active);
 export default function HomePage() {
   const featuredRetailers = RETAILERS.filter((r) => r.sponsored).slice(0, 3);
   const recentArticles = ARTICLES.slice(0, 3);
+  const homeRetailers = RETAILERS.slice(0, 6);
 
   return (
     <div className="space-y-16">
@@ -113,7 +114,7 @@ export default function HomePage() {
             <h2 className="font-heading text-2xl font-bold">Browse by category</h2>
             <p className="text-muted text-sm">Shop sofas, beds, dining, storage, lighting, décor, outdoor and home office.</p>
           </div>
-          <Link href="/discover?category=" className="text-sm font-semibold text-primary hover:underline">
+          <Link href="/categories" className="text-sm font-semibold text-primary hover:underline">
             View all →
           </Link>
         </div>
@@ -121,7 +122,7 @@ export default function HomePage() {
           {CATEGORIES.map((category) => (
             <Link
               key={category.slug}
-              href={`/discover?category=${category.slug}`}
+              href={`/categories/${category.slug}`}
               className="group rounded-xl border border-border bg-white overflow-hidden transition-colors hover:border-primary/60 focus-visible-ring"
               aria-label={`Browse ${category.name}`}
             >
@@ -131,7 +132,10 @@ export default function HomePage() {
                 </span>
               </div>
               <CardContent>
-                <h3 className="font-heading font-bold text-foreground">{category.name}</h3>
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-heading font-bold text-foreground">{category.name}</h3>
+                  <span className="text-[0.65rem] font-semibold text-muted">{category.count}</span>
+                </div>
                 <p className="text-xs text-muted mt-1">{category.description}</p>
               </CardContent>
             </Link>
@@ -151,7 +155,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {ARTICLES.map((article) => (
+          {recentArticles.map((article) => (
             <Link
               key={article.id}
               href={`/guides/${article.slug}`}
@@ -184,7 +188,7 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {RETAILERS.map((retailer) => (
+          {homeRetailers.map((retailer) => (
             <Link
               key={retailer.id}
               href={`/retailers/${retailer.slug}`}

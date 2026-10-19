@@ -476,7 +476,7 @@ function ArticleCard({ a }: { a: any }) {
         </span>
       </div>
       <div className="p-4 flex-1 flex flex-col">
-        <span className="text-xs text-muted mb-2">{a.category}</span>
+        <span className="text-xs text-muted mb-2">{a.category.replace(/-/g, " ")}</span>
         <h3 className="font-heading font-bold text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors">
           {a.title}
         </h3>

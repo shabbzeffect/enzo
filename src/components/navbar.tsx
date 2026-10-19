@@ -14,8 +14,10 @@ export function Navbar() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/discover", label: "Discover" },
+    { href: "/categories", label: "Categories" },
     { href: "/retailers", label: "Retailers" },
     { href: "/guides", label: "Guides" },
+    { href: "/compare", label: "Compare" },
     { href: "/about", label: "About" },
   ];
 
@@ -34,7 +36,7 @@ export function Navbar() {
             <span>Nyumba Edit</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <div className="hidden lg:flex items-center gap-5 text-sm font-medium">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -59,7 +61,7 @@ export function Navbar() {
             <DarkModeToggle />
             <button
               onClick={() => setOpen((o) => !o)}
-              className="md:hidden rounded-xl border border-border bg-white p-2 text-foreground hover:bg-cream-100 focus-visible-ring"
+              className="lg:hidden rounded-xl border border-border bg-white p-2 text-foreground hover:bg-cream-100 focus-visible-ring"
               aria-expanded={open}
               aria-controls="mobile-menu"
             >
@@ -159,8 +161,10 @@ export function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Browse</h3>
             <ul className="space-y-3 text-sm text-muted">
               <li><Link href="/discover" className="hover:text-primary transition-colors">Discover &amp; search</Link></li>
+              <li><Link href="/categories" className="hover:text-primary transition-colors">Browse categories</Link></li>
               <li><Link href="/retailers" className="hover:text-primary transition-colors">Retailer directory</Link></li>
               <li><Link href="/guides" className="hover:text-primary transition-colors">Editorial guides</Link></li>
+              <li><Link href="/compare" className="hover:text-primary transition-colors">Compare products</Link></li>
               <li><Link href="/about" className="hover:text-primary transition-colors">About us</Link></li>
             </ul>
           </div>

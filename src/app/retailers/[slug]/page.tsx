@@ -1,9 +1,11 @@
 import { notFound } from "next/navigation";
-import { getRetailer, getProductsByRetailer } from "@/lib/data/demo";
+import { getRetailer, getProductsByRetailer, getReviewsByRetailer, averageRating } from "@/lib/data/demo";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
+import { StarRating } from "@/components/ui/rating";
 import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
+import { ReviewList, RatingSummary } from "@/components/reviews";
 import Link from "next/link";
 import { ProductImageGallery } from "@/components/product-image-gallery";
 import { SocialShare } from "@/components/social-share";
@@ -41,6 +43,8 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
   if (!retailer) notFound();
 
   const products = getProductsByRetailer(retailer.id);
+  const reviews = getReviewsByRetailer(retailer.id);
+  const rating = averageRating(reviews);
 
   return (
     <div className="space-y-12">
@@ -67,7 +71,7 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
               <div>
                 <h1 className="font-heading text-3xl font-bold text-foreground">{retailer.name}</h1>
                 <p className="mt-1 text-sm text-muted">{retailer.shortDescription}</p>
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-3 flex flex-wrap items-center gap-2">
                   {retailer.verified ? (
                     <Badge variant="success" className="inline-flex">Verified retailer</Badge>
                   ) : (
@@ -76,6 +80,11 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
                   <Badge variant={retailer.madeInKenya ? "success" : "default"} className="ml-2">
                     {retailer.madeInKenya ? "Made in Kenya" : "Retailer"}
                   </Badge>
+                  {rating !== null && (
+                    <a href="#reviews" className="ml-1 inline-flex items-center rounded-lg border border-border bg-cream-100 px-2 py-0.5 hover:border-primary/60 transition-colors focus-visible-ring">
+                      <StarRating rating={rating} size="sm" count={reviews.length} />
+                    </a>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
@@ -162,6 +171,17 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
               </div>
             ) : null}
           </div>
+        </div>
+      </section>
+
+      <section id="reviews" className="scroll-mt-20" aria-label={`Reviews for ${retailer.name}`}>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-heading text-xl font-bold">Customer reviews</h2>
+          <span className="text-xs text-muted">Demo data</span>
+        </div>
+        <RatingSummary reviews={reviews} />
+        <div className="mt-6">
+          <ReviewList reviews={reviews} />
         </div>
       </section>
 

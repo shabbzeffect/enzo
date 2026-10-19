@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getArticle, getProduct } from "@/lib/data/demo";
+import { getArticle, getProduct, articleCategoryName } from "@/lib/data/demo";
 import Link from "next/link";
 import { Card, CardImage } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,7 +60,12 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             )}
           </div>
           <div className="flex-shrink-0">
-            <span className="text-xs font-semibold text-muted uppercase tracking-wider mb-2 block">{article.category}</span>
+            <Link
+              href={`/guides?category=${article.category}`}
+              className="text-xs font-semibold text-primary uppercase tracking-wider mb-2 block hover:underline"
+            >
+              {articleCategoryName(article.category)}
+            </Link>
             <h1 className="font-heading text-3xl font-bold text-ink leading-tight">{article.title}</h1>
             <p className="mt-3 text-sm text-muted">By {article.author} · {new Date(article.publishedAt).toLocaleDateString("en-KE")}</p>
           </div>

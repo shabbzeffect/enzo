@@ -1,11 +1,13 @@
 import { MetadataRoute } from "next";
-import { RETAILERS, PRODUCTS, ARTICLES } from "@/lib/data/demo";
+import { RETAILERS, PRODUCTS, ARTICLES, CATEGORIES } from "@/lib/data/demo";
 import { SITE } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     "",
     "/discover",
+    "/categories",
+    "/compare",
     "/retailers",
     "/guides",
     "/submit",
@@ -20,6 +22,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date().toISOString(),
     changeFrequency: "weekly" as const,
     priority: route === "" ? 1 : 0.8,
+  }));
+
+  const categoryRoutes = CATEGORIES.map((c) => ({
+    url: SITE.url + `/categories/${c.slug}`,
+    lastModified: new Date().toISOString(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
   }));
 
   const retailerRoutes = RETAILERS.map((r) => ({
@@ -43,5 +52,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...retailerRoutes, ...productRoutes, ...articleRoutes];
+  return [
+    ...staticRoutes,
+    ...categoryRoutes,
+    ...retailerRoutes,
+    ...productRoutes,
+    ...articleRoutes,
+  ];
 }

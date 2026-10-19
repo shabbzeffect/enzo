@@ -3,7 +3,15 @@
 import * as React from "react";
 
 type JsonLdProps = {
-  type: "LocalBusiness" | "Product" | "Article" | "BreadcrumbList" | "Organization";
+  type:
+    | "LocalBusiness"
+    | "Product"
+    | "Article"
+    | "BreadcrumbList"
+    | "Organization"
+    | "CollectionPage"
+    | "ItemList"
+    | "WebPage";
   data: Record<string, unknown>;
 };
 

@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
-import { getProduct, getRetailer, PRODUCTS, formatKes } from "@/lib/data/demo";
+import { getProduct, getRetailer, getReviewsForProduct, getCategory, PRODUCTS, ARTICLES, averageRating, articleCategoryName, formatKes } from "@/lib/data/demo";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
+import { StarRating } from "@/components/ui/rating";
+import { ReviewList, RatingSummary } from "@/components/reviews";
+import { CompareToggle } from "@/components/compare";
 import Link from "next/link";
 import { ProductImageGallery } from "@/components/product-image-gallery";
 import { SocialShare } from "@/components/social-share";
@@ -43,6 +46,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = getProduct(slug);
   if (!product) notFound();
   const retailer = getRetailer(product.retailerSlug);
+  const reviews = getReviewsForProduct(product.name);
 
   return (
     <div className="space-y-12">
@@ -50,7 +54,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <nav className="mb-2" aria-label="Breadcrumb">
         <ol className="flex flex-wrap gap-2 text-xs text-muted">
           <li><Link href="/discover" className="hover:text-primary transition-colors">Discover</Link></li>
-          <li><span aria-hidden="true">&rsaquo;</span><Link href={`/discover?category=${product.category}`} className="hover:text-primary transition-colors">{product.category}</Link></li>
+          <li><span aria-hidden="true">&rsaquo;</span><Link href={`/categories/${product.category}`} className="hover:text-primary transition-colors">{getCategory(product.category)?.name ?? product.category}</Link></li>
           <li><span aria-hidden="true">&rsaquo;</span><span className="text-foreground">{product.name}</span></li>
         </ol>
       </nav>
@@ -65,6 +69,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {product.sponsored && <Badge variant="sponsor" className="mb-3">Featured Partner</Badge>}
             <h1 className="font-heading text-3xl font-bold text-foreground">{product.name}</h1>
             <p className="mt-2 text-sm text-muted">{product.retailerName}</p>
+            {reviews.length > 0 && (
+              <div className="mt-2">
+                <StarRating rating={averageRating(reviews) ?? 0} size="sm" count={reviews.length} />
+              </div>
+            )}
           </div>
 
           <Card className="rounded-2xl border border-border shadow-sm">
@@ -145,6 +154,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   title={product.name}
                   message={`Hi, I found "${product.name}" (KSh ${product.priceKes?.toLocaleString("en-KE") ?? "Price on request"}) on Nyumba Edit. Could you confirm price and availability?`}
                 />
+                <div className="pt-1">
+                  <CompareToggle slug={product.slug} className="w-full" />
+                </div>
               </>
             ) : (
               <p className="text-sm text-muted">No contact details available for this retailer.</p>
@@ -157,6 +169,18 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <section className="section">
         <h2 className="font-heading text-xl font-bold mb-4">About this product</h2>
         <p className="text-muted leading-relaxed max-w-2xl">{product.description}</p>
+      </section>
+
+      {/* Reviews */}
+      <section aria-label={`Reviews for ${product.name}`}>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-heading text-xl font-bold">Customer reviews</h2>
+          <span className="text-xs text-muted">Demo data</span>
+        </div>
+        <RatingSummary reviews={reviews} />
+        <div className="mt-6">
+          <ReviewList reviews={reviews} />
+        </div>
       </section>
 
       {/* Related products */}
@@ -173,14 +197,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <section className="section">
         <h2 className="font-heading text-xl font-bold mb-6">Related guides</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Link href="/guides/best-sofa-shops-nairobi-2026" className="block rounded-xl border border-border bg-white p-5 hover:border-primary/60 transition-colors focus-visible-ring">
-            <h3 className="font-heading font-bold text-foreground mb-2">Best sofa shops in Nairobi, 2026</h3>
-            <p className="text-sm text-muted">Where to find living-room sofas in Nairobi.</p>
-          </Link>
-          <Link href="/guides/furnishing-under-kes-50000" className="block rounded-xl border border-border bg-white p-5 hover:border-primary/60 transition-colors focus-visible-ring">
-            <h3 className="font-heading font-bold text-foreground mb-2">Furnishing a one-bedroom apartment under KSh 50,000</h3>
-            <p className="text-sm text-muted">A realistic starter kit with price-check dates.</p>
-          </Link>
+          {relatedGuides(product.slug).map((a) => (
+            <Link key={a.id} href={`/guides/${a.slug}`} className="block rounded-xl border border-border bg-white p-5 hover:border-primary/60 transition-colors focus-visible-ring">
+              <span className="text-xs text-muted">{articleCategoryName(a.category)}</span>
+              <h3 className="font-heading font-bold text-foreground mb-2">{a.title}</h3>
+              <p className="text-sm text-muted line-clamp-2">{a.excerpt}</p>
+            </Link>
+          ))}
         </div>
       </section>
     </div>
@@ -189,6 +212,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
 function getRelatedProducts(product: { category: string; id: string }) {
   return PRODUCTS.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 3);
+}
+
+function relatedGuides(productSlug: string) {
+  const direct = ARTICLES.filter((a) => a.relatedProductSlugs.includes(productSlug));
+  const fallback = ARTICLES.filter((a) => !direct.includes(a));
+  return [...direct, ...fallback].slice(0, 2);
 }
 
 function RelatedProductCard({ p }: { p: { id: string; slug: string; name: string; description: string; priceKes: number | null; priceOnRequest: boolean; images: string[] } }) {

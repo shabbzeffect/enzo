@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { RETAILERS, PRODUCTS, ARTICLES, PROMOTIONS } from "@/lib/data/demo";
+import { RETAILERS, PRODUCTS, ARTICLES, PROMOTIONS, REVIEWS } from "@/lib/data/demo";
 
 export const metadata = {
   title: "Admin dashboard — Nyumba Edit",
@@ -9,22 +9,24 @@ export const metadata = {
 export default function AdminDashboardPage() {
   const sponsoredRetailers = RETAILERS.filter((r) => r.sponsored).length;
   const activePromotions = PROMOTIONS.filter((p) => p.active).length;
+  const pendingReviews = REVIEWS.filter((r) => r.status === "pending").length;
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="font-heading text-2xl md:text-3xl font-bold">Admin dashboard</h1>
         <p className="text-muted text-sm">
-          Manage retailers, products, articles and sponsored placements. This is
-          a demonstration build backed by demo data — changes are not persisted
-          to a database.
+          Manage retailers, products, articles, reviews and sponsored placements.
+          This is a demonstration build backed by demo data — changes are not
+          persisted to a database.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         <StatCard title="Retailers" value={RETAILERS.length} href="/admin/retailers" />
         <StatCard title="Products" value={PRODUCTS.length} href="/admin/products" />
         <StatCard title="Articles" value={ARTICLES.length} href="/admin/articles" />
+        <StatCard title="Reviews" value={REVIEWS.length} href="/admin/reviews" badge={pendingReviews > 0 ? `${pendingReviews} pending` : undefined} />
         <StatCard title="Active promotions" value={activePromotions} href="/admin/promotions" />
       </div>
 
@@ -46,6 +48,10 @@ export default function AdminDashboardPage() {
           <Link href="/admin/promotions" className="rounded-xl border border-border bg-white p-4 text-left hover:bg-cream-100 transition-colors focus-visible-ring block">
             <h3 className="font-heading font-bold text-ink mb-1">Manage sponsored placements</h3>
             <p className="text-xs text-muted">Set promotion dates and sponsor disclosure labels.</p>
+          </Link>
+          <Link href="/admin/reviews" className="rounded-xl border border-border bg-white p-4 text-left hover:bg-cream-100 transition-colors focus-visible-ring block">
+            <h3 className="font-heading font-bold text-ink mb-1">Moderate reviews</h3>
+            <p className="text-xs text-muted">Publish, hold or remove customer reviews (demo).</p>
           </Link>
         </div>
       </div>
@@ -96,7 +102,17 @@ export default function AdminDashboardPage() {
   );
 }
 
-function StatCard({ title, value, href }: { title: string; value: number; href: string }) {
+function StatCard({
+  title,
+  value,
+  href,
+  badge,
+}: {
+  title: string;
+  value: number;
+  href: string;
+  badge?: string;
+}) {
   return (
     <Link
       href={href}
@@ -104,6 +120,9 @@ function StatCard({ title, value, href }: { title: string; value: number; href: 
     >
       <p className="text-xs text-muted uppercase tracking-wider mb-1">{title}</p>
       <p className="font-heading text-2xl font-bold text-ink">{value}</p>
+      {badge && (
+        <p className="mt-1 text-[0.65rem] font-semibold uppercase tracking-wider text-warning">{badge}</p>
+      )}
     </Link>
   );
 }
