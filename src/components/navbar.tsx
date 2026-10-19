@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { DarkModeToggle } from "@/components/ui/theme";
 import { Button } from "@/components/ui/button";
+import { NewsletterSignup } from "@/components/newsletter-signup";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -188,6 +189,13 @@ export function Footer() {
           <p>Nyumba Edit — demo platform. Not a marketplace; no checkout.</p>
           <p>Kenyan shillings (KSh) • Centimetres (cm) • +254 phone format</p>
         </div>
+      </div>
+
+      <div className="mt-12 pt-8 border-t border-border">
+        <NewsletterSignup
+          title="Nyumba Edit newsletter"
+          description="New buying guides, retailer features and home inspiration — straight to your inbox."
+        />
       </div>
     </footer>
   );

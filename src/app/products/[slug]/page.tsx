@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
 import Link from "next/link";
 import { ProductImageGallery } from "@/components/product-image-gallery";
+import { SocialShare } from "@/components/social-share";
 import { JsonLd } from "@/components/json-ld";
 import { SITE } from "@/lib/site";
 
@@ -138,6 +139,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   message={`Hi, I found "${product.name}" on Nyumba Edit. Could you confirm the price, stock and delivery options?`}
                   size="lg"
                   className="w-full"
+                />
+                <SocialShare
+                  url={`${SITE.url}/products/${product.slug}`}
+                  title={product.name}
+                  message={`Hi, I found "${product.name}" (KSh ${product.priceKes?.toLocaleString("en-KE") ?? "Price on request"}) on Nyumba Edit. Could you confirm price and availability?`}
                 />
               </>
             ) : (

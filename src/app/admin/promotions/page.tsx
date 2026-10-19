@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { RETAILERS, PROMOTIONS } from "@/lib/data/demo";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata = {
   title: "Manage sponsored placements — Nyumba Edit admin",
@@ -16,7 +17,7 @@ export default function AdminPromotionsPage() {
           All paid placements must be labelled "Sponsored" or "Featured Partner"
           and are kept separate from editorial recommendations.
         </p>
-        <Link href="/admin" className="text-sm text-green-800 hover:underline">&larr; Back to dashboard</Link>
+        <Link href="/admin" className="text-sm text-primary hover:underline">&larr; Back to dashboard</Link>
       </div>
 
       <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
@@ -35,7 +36,7 @@ export default function AdminPromotionsPage() {
             {PROMOTIONS.map((p) => {
               const target = p.type === "retailer" ? RETAILERS.find((r) => r.id === p.targetId) : null;
               return (
-                <tr key={p.id} className="text-ink">
+                <tr key={p.id} className="text-foreground">
                   <td className="py-4">
                     <div className="font-medium">{p.placement}</div>
                     <p className="text-xs text-muted">{p.type}</p>
@@ -47,20 +48,16 @@ export default function AdminPromotionsPage() {
                     {new Date(p.endDate).toLocaleDateString("en-KE")}
                   </td>
                   <td className="py-4 text-center">
-                    <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium ${
-                      p.label === "Sponsored"
-                        ? "border-terracotta-200 bg-terracotta-50 text-terracotta-800"
-                        : "border-green-200/60 bg-green-50 text-green-800"
-                    }`}>
+                    <Badge
+                      variant={p.label === "Sponsored" ? "tertiary" : "success"}
+                    >
                       {p.label}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="py-4 text-center">
-                    <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-medium ${
-                      p.active ? "border-green-200/60 bg-green-50 text-green-800" : "border-border bg-cream-100 text-muted"
-                    }`}>
+                    <Badge variant={p.active ? "success" : "default"}>
                       {p.active ? "Active" : "Inactive"}
-                    </span>
+                    </Badge>
                   </td>
                 </tr>
               );
@@ -69,8 +66,8 @@ export default function AdminPromotionsPage() {
         </table>
       </div>
 
-      <div className="bg-cream-50 rounded-xl border border-border p-6">
-        <h3 className="font-bold text-ink mb-2">Disclosure requirements</h3>
+      <div className="rounded-xl border border-border bg-cream-50 p-6">
+        <h3 className="font-bold text-foreground mb-2">Disclosure requirements</h3>
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
           <li>Every paid placement must carry a "Sponsored" or "Featured Partner" label next to the placement.</li>
           <li>Labels must not be hidden in footnotes or terms and conditions.</li>

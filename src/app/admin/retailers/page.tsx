@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { RETAILERS } from "@/lib/data/demo";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata = {
   title: "Manage retailers — Nyumba Edit admin",
@@ -15,7 +16,7 @@ export default function AdminRetailersPage() {
           View, edit, publish or archive retailer listings. This is a
           demonstration build — changes are not persisted to a database.
         </p>
-        <Link href="/admin" className="text-sm text-green-800 hover:underline">&larr; Back to dashboard</Link>
+        <Link href="/admin" className="text-sm text-primary hover:underline">&larr; Back to dashboard</Link>
       </div>
 
       <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
@@ -31,7 +32,7 @@ export default function AdminRetailersPage() {
           </thead>
           <tbody className="divide-y divide-border">
             {RETAILERS.map((r) => (
-              <tr key={r.id} className="text-ink">
+              <tr key={r.id} className="text-foreground">
                 <td className="py-4">
                   <div className="font-medium">{r.name}</div>
                   <p className="text-xs text-muted">{r.shortDescription}</p>
@@ -44,18 +45,14 @@ export default function AdminRetailersPage() {
                 </td>
                 <td className="py-4 text-center">
                   {r.sponsored ? (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-terracotta-200 bg-terracotta-50 px-2 py-0.5 text-xs font-medium text-terracotta-800">
-                      Sponsored
-                    </span>
+                    <Badge variant="sponsor">Sponsored</Badge>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-border bg-cream-100 px-2 py-0.5 text-xs font-medium text-muted">
-                      Listed
-                    </span>
+                    <Badge variant="default">Listed</Badge>
                   )}
                 </td>
                 <td className="py-4 text-right">
-                  <Link href={`/retailers/${r.slug}`} className="text-xs text-green-800 hover:underline mr-3">View</Link>
-                  <button className="text-xs text-muted hover:text-ink">Edit</button>
+                  <Link href={`/retailers/${r.slug}`} className="text-xs text-primary hover:underline mr-3">View</Link>
+                  <button className="text-xs text-muted hover:text-foreground">Edit</button>
                 </td>
               </tr>
             ))}
@@ -63,8 +60,8 @@ export default function AdminRetailersPage() {
         </table>
       </div>
 
-      <div className="bg-cream-50 rounded-xl border border-border p-6">
-        <h3 className="font-bold text-ink mb-2">Notes</h3>
+      <div className="rounded-xl border border-border bg-cream-50 p-6">
+        <h3 className="font-bold text-foreground mb-2">Notes</h3>
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
           <li>Edit and archive actions are UI-only in this demonstration build.</li>
           <li>Connect the Prisma database layer to persist changes.</li>

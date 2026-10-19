@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge, SponsorLabel } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
-import { Input, Select } from "@/components/ui/form";
+import { Input, Select, Checkbox } from "@/components/ui/form";
 import { WhatsAppButton } from "@/components/ui/whatsapp";
 
 type Result = { type: string; item: any };
@@ -272,16 +272,16 @@ export default function DiscoverClient() {
           </div>
           <div className="container py-6 px-4 space-y-8">
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-ink">Search</label>
-              <input
+              <Input
+                label="Search"
+                id="mobile-search"
                 defaultValue={filters.q}
-                className="rounded-xl border border-border bg-white px-4 py-2 text-ink focus-visible-ring w-full"
                 onChange={(e) => updateFilter("q", e.target.value)}
               />
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-ink">Category</label>
+              <label className="text-sm font-semibold text-foreground">Category</label>
               <div className="grid grid-cols-2 gap-2">
                 {CATEGORIES.map((c) => (
                   <button
@@ -290,7 +290,7 @@ export default function DiscoverClient() {
                     className={[
                       "rounded-xl border px-3 py-2 text-xs text-center transition-colors",
                       filters.category === c.slug
-                        ? "border-green-800 bg-green-50 text-green-800"
+                        ? "border-primary bg-primary/10 text-primary"
                         : "border-border text-muted hover:bg-cream-100",
                     ].join(" ")}
                   >
@@ -301,67 +301,60 @@ export default function DiscoverClient() {
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-ink">Location</label>
-              <select
+              <label className="text-sm font-semibold text-foreground">Location</label>
+              <Select
+                id="mobile-county"
                 defaultValue={filters.county}
-                className="rounded-xl border border-border bg-white px-4 py-2 text-ink w-full focus-visible-ring"
                 onChange={(e) => updateFilter("county", e.target.value)}
               >
                 <option value="">All counties</option>
                 {COUNTIES.map((c) => (
                   <option key={c.code} value={c.name}>{c.name}</option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-ink">Price range (KSh)</label>
+              <label className="text-sm font-semibold text-foreground">Price range (KSh)</label>
               <div className="grid grid-cols-2 gap-3">
-                <input
+                <Input
+                  id="mobile-min-price"
                   type="number"
                   defaultValue={filters.minPrice}
-                  className="rounded-xl border border-border bg-white px-3 py-2 text-ink focus-visible-ring"
                   placeholder="Min"
+                  onChange={(e) => updateFilter("minPrice", e.target.value)}
                 />
-                <input
+                <Input
+                  id="mobile-max-price"
                   type="number"
                   defaultValue={filters.maxPrice}
-                  className="rounded-xl border border-border bg-white px-3 py-2 text-ink focus-visible-ring"
                   placeholder="Max"
+                  onChange={(e) => updateFilter("maxPrice", e.target.value)}
                 />
               </div>
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm font-semibold text-ink">Options</label>
+              <label className="text-sm font-semibold text-foreground">Options</label>
               <div className="space-y-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={filters.delivery === "true"}
-                    onChange={(e) => updateFilter("delivery", e.target.checked ? "true" : "")}
-                    className="rounded border-green-800 text-green-800 focus:ring-green-800"
-                  />
-                  <span className="text-sm text-ink">Delivery available</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={filters.assembly === "true"}
-                    onChange={(e) => updateFilter("assembly", e.target.checked ? "true" : "")}
-                    className="rounded border-green-800 text-green-800 focus:ring-green-800"
-                  />
-                  <span className="text-sm text-ink">Assembly available</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={filters.customization === "true"}
-                    onChange={(e) => updateFilter("customization", e.target.checked ? "true" : "")}
-                    className="rounded border-green-800 text-green-800 focus:ring-green-800"
-                  />
-                  <span className="text-sm text-ink">Customisation available</span>
-                </label>
+                <Checkbox
+                  id="mobile-delivery"
+                  label="Delivery available"
+                  checked={filters.delivery === "true"}
+                  onChange={(e) => updateFilter("delivery", e.target.checked ? "true" : "")}
+                />
+                <Checkbox
+                  id="mobile-assembly"
+                  label="Assembly available"
+                  checked={filters.assembly === "true"}
+                  onChange={(e) => updateFilter("assembly", e.target.checked ? "true" : "")}
+                />
+                <Checkbox
+                  id="mobile-customization"
+                  label="Customisation available"
+                  checked={filters.customization === "true"}
+                  onChange={(e) => updateFilter("customization", e.target.checked ? "true" : "")}
+                />
               </div>
             </div>
 

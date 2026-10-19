@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PRODUCTS } from "@/lib/data/demo";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata = {
   title: "Manage products — Nyumba Edit admin",
@@ -15,7 +16,7 @@ export default function AdminProductsPage() {
           View, edit, publish or archive product listings. This is a
           demonstration build — changes are not persisted to a database.
         </p>
-        <Link href="/admin" className="text-sm text-green-800 hover:underline">&larr; Back to dashboard</Link>
+        <Link href="/admin" className="text-sm text-primary hover:underline">&larr; Back to dashboard</Link>
       </div>
 
       <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
@@ -31,7 +32,7 @@ export default function AdminProductsPage() {
           </thead>
           <tbody className="divide-y divide-border">
             {PRODUCTS.map((p) => (
-              <tr key={p.id} className="text-ink">
+              <tr key={p.id} className="text-foreground">
                 <td className="py-4">
                   <div className="font-medium">{p.name}</div>
                   <p className="text-xs text-muted">{p.description}</p>
@@ -41,23 +42,19 @@ export default function AdminProductsPage() {
                   {p.priceKes === null ? (
                     <span className="text-xs text-muted">On request</span>
                   ) : (
-                    <span className="text-xs font-medium text-ink">KSh {p.priceKes.toLocaleString("en-KE")}</span>
+                    <span className="text-xs font-medium text-foreground">KSh {p.priceKes.toLocaleString("en-KE")}</span>
                   )}
                 </td>
                 <td className="py-4 text-center">
                   {p.priceConfirmed ? (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-green-200/60 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-800">
-                      Price confirmed
-                    </span>
+                    <Badge variant="success">Price confirmed</Badge>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-terracotta-200 bg-terracotta-50 px-2 py-0.5 text-xs font-medium text-terracotta-800">
-                      Not confirmed
-                    </span>
+                    <Badge variant="warning">Not confirmed</Badge>
                   )}
                 </td>
                 <td className="py-4 text-right">
-                  <Link href={`/products/${p.slug}`} className="text-xs text-green-800 hover:underline mr-3">View</Link>
-                  <button className="text-xs text-muted hover:text-ink">Edit</button>
+                  <Link href={`/products/${p.slug}`} className="text-xs text-primary hover:underline mr-3">View</Link>
+                  <button className="text-xs text-muted hover:text-foreground">Edit</button>
                 </td>
               </tr>
             ))}
@@ -65,8 +62,8 @@ export default function AdminProductsPage() {
         </table>
       </div>
 
-      <div className="bg-cream-50 rounded-xl border border-border p-6">
-        <h3 className="font-bold text-ink mb-2">Notes</h3>
+      <div className="rounded-xl border border-border bg-cream-50 p-6">
+        <h3 className="font-bold text-foreground mb-2">Notes</h3>
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
           <li>Prices are shown in Kenyan shillings (KSh); dimensions are in centimetres (cm).</li>
           <li>Price confirmation status and last-checked dates must be maintained against real retailer data before publication.</li>
