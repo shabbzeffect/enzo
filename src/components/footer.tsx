@@ -28,17 +28,23 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-muted">
               <li><Link href="/discover" className="hover:text-green-800 transition-colors">Discover &amp; search</Link></li>
               <li><Link href="/retailers" className="hover:text-green-800 transition-colors">Retailer directory</Link></li>
+              <li><Link href="/categories" className="hover:text-green-800 transition-colors">Categories</Link></li>
+              <li><Link href="/collections" className="hover:text-green-800 transition-colors">Collections &amp; lookbooks</Link></li>
               <li><Link href="/guides" className="hover:text-green-800 transition-colors">Editorial guides</Link></li>
+              <li><Link href="/locations" className="hover:text-green-800 transition-colors">Shop by location</Link></li>
               <li><Link href="/about" className="hover:text-green-800 transition-colors">About us</Link></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-bold mb-4">For retailers</h3>
+            <h3 className="font-bold mb-4">Tools</h3>
             <ul className="space-y-3 text-sm text-muted">
+              <li><Link href="/compare" className="hover:text-green-800 transition-colors">Compare products</Link></li>
+              <li><Link href="/saved" className="hover:text-green-800 transition-colors">Saved items</Link></li>
+              <li><Link href="/planner" className="hover:text-green-800 transition-colors">Budget planner</Link></li>
+              <li><Link href="/faq" className="hover:text-green-800 transition-colors">FAQ</Link></li>
               <li><Link href="/submit" className="hover:text-green-800 transition-colors">List your business</Link></li>
-              <li><Link href="/advertise" className="hover:text-green-800 transition-colors">Advertise &amp; sponsored placements</Link></li>
-              <li><Link href="/editorial-policy" className="hover:text-green-800 transition-colors">Editorial policy</Link></li>
+              <li><Link href="/advertise" className="hover:text-green-800 transition-colors">Advertise</Link></li>
             </ul>
           </div>
 
@@ -48,6 +54,7 @@ export function Footer() {
               <li><Link href="/contact" className="hover:text-green-800 transition-colors">Contact</Link></li>
               <li><Link href="/privacy" className="hover:text-green-800 transition-colors">Privacy</Link></li>
               <li><Link href="/terms" className="hover:text-green-800 transition-colors">Terms</Link></li>
+              <li><Link href="/editorial-policy" className="hover:text-green-800 transition-colors">Editorial policy</Link></li>
               <li><Link href="/admin" className="hover:text-green-800 transition-colors">Admin (protected)</Link></li>
             </ul>
           </div>

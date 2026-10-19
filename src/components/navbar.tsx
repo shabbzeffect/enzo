@@ -6,6 +6,7 @@ import { useState } from "react";
 import { DarkModeToggle } from "@/components/ui/theme";
 import { Button } from "@/components/ui/button";
 import { NewsletterSignup } from "@/components/newsletter-signup";
+import { SavedCount } from "@/components/saved";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -15,9 +16,10 @@ export function Navbar() {
     { href: "/", label: "Home" },
     { href: "/discover", label: "Discover" },
     { href: "/categories", label: "Categories" },
+    { href: "/collections", label: "Collections" },
     { href: "/retailers", label: "Retailers" },
     { href: "/guides", label: "Guides" },
-    { href: "/compare", label: "Compare" },
+    { href: "/saved", label: "Saved", showSavedCount: true },
     { href: "/about", label: "About" },
   ];
 
@@ -47,6 +49,7 @@ export function Navbar() {
                 ].join(" ")}
               >
                 {link.label}
+                {link.showSavedCount && <SavedCount />}
               </Link>
             ))}
             <Link
@@ -105,13 +108,14 @@ export function Navbar() {
                   href={link.href}
                   onClick={() => setOpen(false)}
                   className={[
-                    "block rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                    "flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors",
                     pathname === link.href
                       ? "bg-primary/10 text-primary"
                       : "text-muted hover:bg-cream-100 hover:text-primary",
                   ].join(" ")}
                 >
                   {link.label}
+                  {link.showSavedCount && <SavedCount />}
                 </Link>
               ))}
             </nav>

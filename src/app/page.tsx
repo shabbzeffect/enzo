@@ -8,6 +8,7 @@ import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
 import { WhatsAppButton } from "@/components/ui/whatsapp";
 import { Input, Select } from "@/components/ui/form";
+import { RecentlyViewedSection } from "@/components/recently-viewed";
 
 export const metadata = {
   title: "Find furniture and home stores in Kenya",
@@ -219,6 +220,9 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Recently viewed */}
+      <RecentlyViewedSection />
 
       {/* Retailer CTA */}
       <section className="section rounded-2xl border border-border bg-primary p-8 md:p-12 text-accent-foreground">

@@ -13,6 +13,7 @@ import { Badge, SponsorLabel } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
 import { CompareToggle } from "@/components/compare";
+import { SaveToggle } from "@/components/saved";
 import { JsonLd } from "@/components/json-ld";
 import { SITE } from "@/lib/site";
 
@@ -178,6 +179,7 @@ export default async function CategoryPage({ params }: Params) {
                       <Link href={`/products/${p.slug}`}>View product</Link>
                     </Button>
                     <CompareToggle slug={p.slug} />
+                    <SaveToggle slug={p.slug} />
                   </div>
                 </CardContent>
               </Card>

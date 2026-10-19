@@ -11,7 +11,8 @@ type JsonLdProps = {
     | "Organization"
     | "CollectionPage"
     | "ItemList"
-    | "WebPage";
+    | "WebPage"
+    | "FAQPage";
   data: Record<string, unknown>;
 };
 

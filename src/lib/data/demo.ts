@@ -167,6 +167,49 @@ export type Enquiry = {
   createdAt: string;
 };
 
+export type Collection = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string;
+  theme: "room" | "budget" | "style" | "season";
+  room?: string; // e.g. "living-room", "bedroom", "home-office"
+  budgetBand?: "under-25k" | "25k-75k" | "75k-200k" | "200k-plus";
+  productSlugs: string[];
+  retailerSlugs: string[];
+  curatorNote?: string;
+  publishedAt: string;
+  sponsored: boolean;
+  sponsorLabel?: string;
+};
+
+export type PricePoint = {
+  date: string; // ISO date
+  priceKes: number | null;
+};
+
+export type PriceHistory = {
+  productSlug: string;
+  points: PricePoint[]; // chronological, oldest first
+};
+
+export type PlannerRoom = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  essentials: PlannerItem[];
+  tips: string[];
+};
+
+export type PlannerItem = {
+  label: string;
+  category: string; // category slug
+  minBudget: number; // KSh
+  tip: string;
+};
+
 // ---------------------------------------------------------------------------
 // Counties (sample set — not all 47; production should seed all 47)
 // ---------------------------------------------------------------------------
@@ -183,44 +226,125 @@ export const COUNTIES: County[] = [
         { slug: "ngong-road", name: "Ngong Road" },
         { slug: "mombasa-road", name: "Mombasa Road" },
         { slug: "kijabe-street", name: "Kijabe Street" },
+        { slug: "south-b", name: "South B" },
+        { slug: "kileleshwa", name: "Kileleshwa" },
       ] },
       { slug: "thika-road", name: "Thika Road" },
     ],
   },
   {
-    code: "01",
+    code: "02",
     name: "Mombasa",
     towns: [
       { slug: "mombasa", name: "Mombasa", areas: [
         { slug: "nyali", name: "Nyali" },
         { slug: "likoni", name: "Likoni" },
+        { slug: "port-reitz", name: "Port Reitz" },
       ] },
     ],
   },
   {
-    code: "01",
+    code: "03",
     name: "Kisumu",
     towns: [
       { slug: "kisumu", name: "Kisumu", areas: [
         { slug: "milimani", name: "Milimani" },
+        { slug: "kondele", name: "Kondele" },
       ] },
     ],
   },
   {
-    code: "01",
+    code: "04",
     name: "Nakuru",
     towns: [
       { slug: "nakuru", name: "Nakuru", areas: [
         { slug: "free-area", name: "Free Area" },
+        { slug: "shabab", name: "Shabab" },
       ] },
     ],
   },
   {
-    code: "01",
+    code: "05",
     name: "Eldoret",
     towns: [
       { slug: "eldoret", name: "Eldoret", areas: [
         { slug: "langas", name: "Langas" },
+        { slug: "elgon-view", name: "Elgon View" },
+      ] },
+    ],
+  },
+  {
+    code: "06",
+    name: "Kiambu",
+    towns: [
+      { slug: "thika", name: "Thika", areas: [
+        { slug: "makongeni", name: "Makongeni" },
+      ] },
+      { slug: "ruiru", name: "Ruiru" },
+      { slug: "juja", name: "Juja" },
+    ],
+  },
+  {
+    code: "07",
+    name: "Machakos",
+    towns: [
+      { slug: "machakos-town", name: "Machakos Town", areas: [
+        { slug: "mua", name: "Mua" },
+      ] },
+      { slug: "athi-river", name: "Athi River" },
+    ],
+  },
+  {
+    code: "08",
+    name: "Nyeri",
+    towns: [
+      { slug: "nyeri", name: "Nyeri", areas: [
+        { slug: "rinku", name: "Rutundu" },
+      ] },
+    ],
+  },
+  {
+    code: "09",
+    name: "Meru",
+    towns: [
+      { slug: "meru", name: "Meru", areas: [
+        { slug: "kiirua", name: "Kiirua" },
+      ] },
+    ],
+  },
+  {
+    code: "10",
+    name: "Kakamega",
+    towns: [
+      { slug: "kakamega", name: "Kakamega", areas: [
+        { slug: "shibuli", name: "Shibuli" },
+      ] },
+    ],
+  },
+  {
+    code: "11",
+    name: "Uasin Gishu",
+    towns: [
+      { slug: "eldoret-uasin", name: "Eldoret", areas: [
+        { slug: "pioneer", name: "Pioneer" },
+      ] },
+    ],
+  },
+  {
+    code: "12",
+    name: "Kajiado",
+    towns: [
+      { slug: "kajiado", name: "Kajiado", areas: [
+        { slug: "kitengela", name: "Kitengela" },
+      ] },
+    ],
+  },
+  {
+    code: "13",
+    name: "Trans Nzoia",
+    towns: [
+      { slug: "kitale", name: "Kitale", areas: [
+        { slug: "kitale-town", name: "Kitale Town" },
       ] },
     ],
   },
@@ -776,6 +900,192 @@ export const RETAILERS: Retailer[] = [
     paymentMethods: ["M-Pesa", "Cash"],
     createdAt: "2026-01-12",
     updatedAt: "2025-12-12",
+    sponsored: false,
+  },
+  {
+    id: "ret-015",
+    slug: "thika-road-furnishers",
+    name: "Thika Road Furnishers",
+    shortDescription: "Affordable sofas, beds and storage for new homes.",
+    description:
+      "A large-format furnisher on Thika Road stocking affordable sofas, bed frames and wardrobes, with same-week delivery across Nairobi and Kiambu.",
+    logo: "placeholder:logo-thikaroad",
+    cover: "placeholder:cover-thikaroad",
+    categories: ["sofas", "beds", "storage"],
+    county: "Kiambu",
+    town: "Thika",
+    area: "Makongeni",
+    serviceAreas: ["Kiambu", "Nairobi"],
+    phone: "+254700000015",
+    whatsapp: "+254700000015",
+    email: "sales@example.demo",
+    website: "https://example.demo/thika-road-furnishers",
+    facebook: "Thika Road Furnishers",
+    verified: false,
+    showroom: true,
+    onlineOnly: false,
+    madeInKenya: false,
+    delivery: true,
+    assembly: true,
+    customization: false,
+    priceConfirmed: true,
+    priceLastChecked: "2026-02-18",
+    paymentMethods: ["M-Pesa", "Cash", "Card"],
+    createdAt: "2025-09-14",
+    updatedAt: "2026-02-18",
+    sponsored: true,
+    sponsorLabel: "Featured Partner",
+  },
+  {
+    id: "ret-016",
+    slug: "mua-timber-machakos",
+    name: "Mua Timber Machakos",
+    shortDescription: "Hardwood dining and bedroom sets, made to order.",
+    description:
+      "A Machakos timber yard and workshop building dining tables, bed frames and wardrobes from local hardwood, quoted per order and delivered across Machakos County.",
+    logo: "placeholder:logo-mua",
+    cover: "placeholder:cover-mua",
+    categories: ["dining", "beds", "storage"],
+    county: "Machakos",
+    town: "Machakos Town",
+    area: "Mua",
+    serviceAreas: ["Machakos", "Makueni"],
+    phone: "+254700000016",
+    whatsapp: "+254700000016",
+    verified: false,
+    showroom: false,
+    onlineOnly: true,
+    madeInKenya: true,
+    delivery: true,
+    assembly: true,
+    customization: true,
+    priceConfirmed: false,
+    priceLastChecked: "2025-11-08",
+    paymentMethods: ["M-Pesa", "Cash"],
+    createdAt: "2025-10-30",
+    updatedAt: "2025-11-08",
+    sponsored: false,
+  },
+  {
+    id: "ret-017",
+    slug: "nyeri-home-store",
+    name: "Nyeri Home Store",
+    shortDescription: "Living-room, dining and bedroom furniture in Nyeri.",
+    description:
+      "A family-run store in Nyeri town stocking living-room seating, dining sets and bedroom furniture, with delivery into Nyeri town and the surrounding farms.",
+    logo: "placeholder:logo-nyeri",
+    cover: "placeholder:cover-nyeri",
+    categories: ["sofas", "dining", "beds"],
+    county: "Nyeri",
+    town: "Nyeri",
+    serviceAreas: ["Nyeri", "Kirinyaga", "Laikipia"],
+    phone: "+254700000017",
+    whatsapp: "+254700000017",
+    email: "nyeri@example.demo",
+    verified: false,
+    showroom: true,
+    onlineOnly: false,
+    madeInKenya: true,
+    delivery: true,
+    assembly: true,
+    customization: false,
+    priceConfirmed: true,
+    priceLastChecked: "2026-02-11",
+    paymentMethods: ["M-Pesa", "Cash"],
+    createdAt: "2025-11-20",
+    updatedAt: "2026-02-11",
+    sponsored: false,
+  },
+  {
+    id: "ret-018",
+    slug: "kitengela-bargain-furniture",
+    name: "Kitengela Bargain Furniture",
+    shortDescription: "Budget sofas, beds and storage on the Nairobi–Namanga road.",
+    description:
+      "A high-volume, budget-priced furniture yard in Kitengela serving first-time buyers and landlords across Kajiado and southern Nairobi, with cash and M-Pesa payment.",
+    logo: "placeholder:logo-kitengela",
+    cover: "placeholder:cover-kitengela",
+    categories: ["sofas", "beds", "storage"],
+    county: "Kajiado",
+    town: "Kitengela",
+    serviceAreas: ["Kajiado", "Nairobi"],
+    phone: "+254700000018",
+    whatsapp: "+254700000018",
+    website: "https://example.demo/kitengela-bargain",
+    verified: false,
+    showroom: true,
+    onlineOnly: false,
+    madeInKenya: false,
+    delivery: true,
+    assembly: true,
+    customization: false,
+    priceConfirmed: true,
+    priceLastChecked: "2026-02-20",
+    paymentMethods: ["M-Pesa", "Cash"],
+    createdAt: "2025-12-28",
+    updatedAt: "2026-02-20",
+    sponsored: false,
+  },
+  {
+    id: "ret-019",
+    slug: "meru-woodcraft",
+    name: "Meru Woodcraft",
+    shortDescription: "Hand-carved timber furniture from Meru workshops.",
+    description:
+      "A Meru collective of woodworkers making hand-carved dining sets, bed frames and décor pieces from local hardwood, with custom commissions welcome.",
+    logo: "placeholder:logo-meru",
+    cover: "placeholder:cover-meru",
+    categories: ["dining", "beds", "decor"],
+    county: "Meru",
+    town: "Meru",
+    area: "Kiirua",
+    serviceAreas: ["Meru", "Tharaka-Nithi"],
+    phone: "+254700000019",
+    whatsapp: "+254700000019",
+    instagram: "@meruwoodcraft.demo",
+    verified: false,
+    showroom: true,
+    onlineOnly: false,
+    madeInKenya: true,
+    delivery: true,
+    assembly: true,
+    customization: true,
+    priceConfirmed: false,
+    priceLastChecked: "2025-12-01",
+    paymentMethods: ["M-Pesa", "Cash"],
+    createdAt: "2026-01-25",
+    updatedAt: "2025-12-01",
+    sponsored: false,
+  },
+  {
+    id: "ret-020",
+    slug: "lakeside-lighting-kisumu",
+    name: "Lakeside Lighting & Décor",
+    shortDescription: "Lighting, rugs and accessories for western Kenya.",
+    description:
+      "A Kisumu décor studio stocking pendant and floor lamps, woven rugs and decorative accessories, with delivery across Kisumu and Siaya.",
+    logo: "placeholder:logo-lakeside",
+    cover: "placeholder:cover-lakeside",
+    categories: ["lighting", "decor"],
+    county: "Kisumu",
+    town: "Kisumu",
+    area: "Kondele",
+    serviceAreas: ["Kisumu", "Siaya", "Homa Bay"],
+    phone: "+254700000020",
+    whatsapp: "+254700000020",
+    email: "hello@example.demo",
+    verified: false,
+    showroom: true,
+    onlineOnly: false,
+    madeInKenya: true,
+    delivery: true,
+    assembly: false,
+    customization: false,
+    priceConfirmed: true,
+    priceLastChecked: "2026-02-06",
+    paymentMethods: ["M-Pesa", "Cash", "Card"],
+    createdAt: "2025-12-10",
+    updatedAt: "2026-02-06",
     sponsored: false,
   },
 ];
@@ -1457,6 +1767,294 @@ export const PRODUCTS: Product[] = [
     priceConfirmed: true,
     createdAt: "2026-02-07",
   },
+  {
+    id: "prod-029",
+    slug: "baraka-three-seater-sofa",
+    name: "Baraka Three-Seater Sofa",
+    description:
+      "Budget-friendly three-seater in hard-wearing fabric, a common first-sofa choice for new apartments.",
+    category: "sofas",
+    retailerId: "ret-015",
+    retailerName: "Thika Road Furnishers",
+    retailerSlug: "thika-road-furnishers",
+    priceKes: 32000,
+    priceOnRequest: false,
+    dimensions: { widthCm: 195, depthCm: 85, heightCm: 82 },
+    materials: ["Pine frame", "Fabric upholstery", "Foam cushioning"],
+    images: ["placeholder:prod-baraka-sofa-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: true,
+    customization: false,
+    deliveryNotes: "Delivery within Nairobi and Thika Road corridor included.",
+    priceLastChecked: "2026-02-18",
+    priceConfirmed: true,
+    createdAt: "2026-01-14",
+  },
+  {
+    id: "prod-030",
+    slug: "mua-hardwood-dining-table",
+    name: "Mua Hardwood Dining Table",
+    description:
+      "Solid hardwood dining table seating six, built in the Machakos workshop and finished with natural oil.",
+    category: "dining",
+    retailerId: "ret-016",
+    retailerName: "Mua Timber Machakos",
+    retailerSlug: "mua-timber-machakos",
+    priceKes: 54000,
+    priceOnRequest: false,
+    dimensions: { widthCm: 170, depthCm: 90, heightCm: 76 },
+    materials: ["Solid hardwood", "Natural oil finish"],
+    images: ["placeholder:prod-mua-table-1"],
+    availability: "made-to-order",
+    delivery: true,
+    assembly: true,
+    customization: true,
+    deliveryNotes: "Lead time 3 weeks. Delivery across Machakos County quoted per order.",
+    priceLastChecked: "2025-11-08",
+    priceConfirmed: false,
+    createdAt: "2025-12-01",
+  },
+  {
+    id: "prod-031",
+    slug: "nyeri-lounge-sofa",
+    name: "Nyeri Two-Seater Lounge Sofa",
+    description:
+      "Compact two-seater sofa with firm cushions, suited to smaller living rooms and sitting rooms.",
+    category: "sofas",
+    retailerId: "ret-017",
+    retailerName: "Nyeri Home Store",
+    retailerSlug: "nyeri-home-store",
+    priceKes: 27500,
+    priceOnRequest: false,
+    dimensions: { widthCm: 160, depthCm: 82, heightCm: 80 },
+    materials: ["Timber frame", "Fabric upholstery", "Foam cushioning"],
+    images: ["placeholder:prod-nyeri-sofa-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: false,
+    customization: false,
+    deliveryNotes: "Delivery within Nyeri town included.",
+    priceLastChecked: "2026-02-11",
+    priceConfirmed: true,
+    createdAt: "2026-01-06",
+  },
+  {
+    id: "prod-032",
+    slug: "kitengela-bunk-bed",
+    name: "Kitengela Bunk Bed",
+    description:
+      "Value-priced pine bunk bed with a ladder and guard rail, a popular rental-property purchase.",
+    category: "beds",
+    retailerId: "ret-018",
+    retailerName: "Kitengela Bargain Furniture",
+    retailerSlug: "kitengela-bargain-furniture",
+    priceKes: 22000,
+    priceOnRequest: false,
+    dimensions: { widthCm: 200, depthCm: 100, heightCm: 155 },
+    materials: ["Solid pine", "Guard rail", "Metal fixings"],
+    images: ["placeholder:prod-kitengela-bunk-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: true,
+    customization: false,
+    deliveryNotes: "Delivery to Kitengela, Athi River and southern Nairobi.",
+    priceLastChecked: "2026-02-20",
+    priceConfirmed: true,
+    createdAt: "2026-02-01",
+  },
+  {
+    id: "prod-033",
+    slug: "meru-carved-dining-set",
+    name: "Meru Carved Dining Set",
+    description:
+      "Hand-carved six-seat dining set with matching chairs, each piece signed by the maker.",
+    category: "dining",
+    retailerId: "ret-019",
+    retailerName: "Meru Woodcraft",
+    retailerSlug: "meru-woodcraft",
+    priceKes: 96000,
+    priceOnRequest: false,
+    dimensions: { widthCm: 185, depthCm: 95, heightCm: 78 },
+    materials: ["Hand-carved hardwood", "Natural wax finish"],
+    images: ["placeholder:prod-meru-dining-1", "placeholder:prod-meru-dining-2"],
+    availability: "made-to-order",
+    delivery: true,
+    assembly: true,
+    customization: true,
+    deliveryNotes: "Made to order in 4 weeks. Delivery across Meru quoted per order.",
+    priceLastChecked: "2025-12-01",
+    priceConfirmed: false,
+    createdAt: "2026-02-04",
+  },
+  {
+    id: "prod-034",
+    slug: "lakeside-pendant-lamp",
+    name: "Lakeside Pendant Lamp",
+    description:
+      "Woven pendant lampshade with a warm glow, made by lakeside weavers and fitted for standard ceiling roses.",
+    category: "lighting",
+    retailerId: "ret-020",
+    retailerName: "Lakeside Lighting & Décor",
+    retailerSlug: "lakeside-lighting-kisumu",
+    priceKes: 4200,
+    priceOnRequest: false,
+    dimensions: { widthCm: 40, depthCm: 40, heightCm: 28 },
+    materials: ["Woven shade", "Metal fitting", "Cable"],
+    images: ["placeholder:prod-lakeside-pendant-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: false,
+    customization: false,
+    deliveryNotes: "Bulb not included. Delivery within Kisumu County.",
+    priceLastChecked: "2026-02-06",
+    priceConfirmed: true,
+    createdAt: "2026-01-18",
+  },
+  {
+    id: "prod-035",
+    slug: "juja-study-desk",
+    name: "Juja Study Desk",
+    description:
+      "Simple study desk with a single drawer, sized for students and home offices in Juja and Thika.",
+    category: "home-office",
+    retailerId: "ret-015",
+    retailerName: "Thika Road Furnishers",
+    retailerSlug: "thika-road-furnishers",
+    priceKes: 8900,
+    priceOnRequest: false,
+    dimensions: { widthCm: 100, depthCm: 50, heightCm: 75 },
+    materials: ["MDF", "Melamine finish", "Metal legs"],
+    images: ["placeholder:prod-juja-desk-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: true,
+    customization: false,
+    deliveryNotes: "Flat-packed. Delivery within Kiambu County.",
+    priceLastChecked: "2026-02-18",
+    priceConfirmed: true,
+    createdAt: "2026-01-22",
+  },
+  {
+    id: "prod-036",
+    slug: "athi-river-wardrobe",
+    name: "Athi River Three-Door Wardrobe",
+    description:
+      "Three-door wardrobe with a hanging rail and two drawers, finished for dusty environments.",
+    category: "beds",
+    retailerId: "ret-016",
+    retailerName: "Mua Timber Machakos",
+    retailerSlug: "mua-timber-machakos",
+    priceKes: 45000,
+    priceOnRequest: false,
+    dimensions: { widthCm: 135, depthCm: 55, heightCm: 200 },
+    materials: ["Hardwood", "Metal handles", "Lacquer finish"],
+    images: ["placeholder:prod-athi-wardrobe-1"],
+    availability: "made-to-order",
+    delivery: true,
+    assembly: true,
+    customization: true,
+    deliveryNotes: "Lead time 2–3 weeks. Delivery across Machakos County.",
+    priceLastChecked: "2025-11-08",
+    priceConfirmed: false,
+    createdAt: "2026-01-09",
+  },
+  {
+    id: "prod-037",
+    slug: "kileleshwa-coffee-table",
+    name: "Kileleshwa Coffee Table",
+    description:
+      "Low coffee table with a timber top and steel legs, suited to contemporary Nairobi living rooms.",
+    category: "sofas",
+    retailerId: "ret-007",
+    retailerName: "Savanna Seating Co.",
+    retailerSlug: "savanna-seating",
+    priceKes: 15500,
+    priceOnRequest: false,
+    dimensions: { widthCm: 110, depthCm: 55, heightCm: 42 },
+    materials: ["Timber top", "Steel legs", "Clear coat"],
+    images: ["placeholder:prod-kileleshwa-table-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: false,
+    customization: false,
+    deliveryNotes: "Free delivery within Nairobi.",
+    priceLastChecked: "2026-02-14",
+    priceConfirmed: true,
+    createdAt: "2026-02-09",
+  },
+  {
+    id: "prod-038",
+    slug: "elgon-view-bed-frame",
+    name: "Elgon View King Bed Frame",
+    description:
+      "King bed frame with a slatted headboard, built in the Elgon View workshop from treated timber.",
+    category: "beds",
+    retailerId: "ret-010",
+    retailerName: "Eldoret Woodworks",
+    retailerSlug: "eldoret-woodworks",
+    priceKes: 38000,
+    priceOnRequest: false,
+    dimensions: { widthCm: 180, depthCm: 200, heightCm: 105 },
+    materials: ["Treated timber", "Slatted headboard"],
+    images: ["placeholder:prod-elgon-bed-1"],
+    availability: "made-to-order",
+    delivery: true,
+    assembly: true,
+    customization: true,
+    deliveryNotes: "Lead time 2–3 weeks. Delivery across Uasin Gishu.",
+    priceLastChecked: "2025-10-30",
+    priceConfirmed: false,
+    createdAt: "2026-01-12",
+  },
+  {
+    id: "prod-039",
+    slug: "shabab-floor-lamp",
+    name: "Shabab Arc Floor Lamp",
+    description:
+      "Arc floor lamp that reaches over sofas and reading chairs, with a marble-effect base.",
+    category: "lighting",
+    retailerId: "ret-013",
+    retailerName: "Acacia Lighting Studio",
+    retailerSlug: "acacia-lighting",
+    priceKes: 11800,
+    priceOnRequest: false,
+    dimensions: { widthCm: 35, depthCm: 90, heightCm: 180 },
+    materials: ["Steel arc", "Weighted base", "Fabric shade"],
+    images: ["placeholder:prod-shabab-lamp-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: false,
+    customization: false,
+    deliveryNotes: "Bulb not included. Delivery across Nakuru County.",
+    priceLastChecked: "2026-01-28",
+    priceConfirmed: true,
+    createdAt: "2026-02-01",
+  },
+  {
+    id: "prod-040",
+    slug: "kakamega-storage-chest",
+    name: "Kakamega Storage Chest",
+    description:
+      "Lidded storage chest for blankets and linens, with a hinged top and side handles.",
+    category: "storage",
+    retailerId: "ret-019",
+    retailerName: "Meru Woodcraft",
+    retailerSlug: "meru-woodcraft",
+    priceKes: 16500,
+    priceOnRequest: false,
+    dimensions: { widthCm: 90, depthCm: 45, heightCm: 45 },
+    materials: ["Solid hardwood", "Hinged lid", "Side handles"],
+    images: ["placeholder:prod-kakamega-chest-1"],
+    availability: "in-stock",
+    delivery: true,
+    assembly: false,
+    customization: true,
+    deliveryNotes: "Delivery quoted per destination.",
+    priceLastChecked: "2025-12-01",
+    priceConfirmed: false,
+    createdAt: "2026-01-30",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1599,6 +2197,57 @@ export const ARTICLES: Article[] = [
     relatedProductSlugs: ["bahari-outdoor-lounge", "shimba-patio-table", "pwani-sun-lounger"],
     relatedRetailerSlugs: ["coast-living", "shimba-outdoor"],
     disclosure: "Editorial guide. Shimba Outdoor Co. is a Nyumba Edit retailer and is named with a link to its listing; it did not review or pay for this article.",
+    sponsored: false,
+  },
+  {
+    id: "art-009",
+    slug: "first-apartment-furniture-kenya",
+    title: "Furnishing your first apartment in Kenya",
+    excerpt:
+      "A room-by-room checklist for a first apartment, with realistic budgets and what to buy first.",
+    body: "Furnishing a first apartment is less about buying everything at once and more about sequencing. Start with the bedroom — a bed and somewhere to put clothes — then a place to sit and eat. Living-room sofas and dining sets can wait a month or two if cash is tight. Set a budget per room, confirm delivery fees before ordering, and keep M-Pesa receipts for anything with a warranty. This guide walks through each room with rough budgets in KSh and links to demo listings.",
+    author: "Wanjiku Mwangi",
+    authorSlug: "wanjiku-mwangi",
+    publishedAt: "2026-02-20",
+    image: "placeholder:art-first-apartment",
+    category: "guides",
+    relatedProductSlugs: ["baraka-three-seater-sofa", "juja-study-desk", "tembo-bunk-bed"],
+    relatedRetailerSlugs: ["thika-road-furnishers", "kitengela-bargain-furniture"],
+    disclosure: "Editorial guide. Retailers named were not paid for inclusion; demo prices were last checked on the dates listed.",
+    sponsored: false,
+  },
+  {
+    id: "art-010",
+    slug: "choosing-timber-furniture-kenya",
+    title: "Choosing timber furniture in Kenya: mvule, pine and hardwood",
+    excerpt:
+      "What common Kenyan furniture timbers mean for price, durability and finish.",
+    body: "Timber choice drives both price and lifespan. Hardwoods like mvule and mahogany resist denting and take oil finishes well but cost more. Pine is lighter on budget, easy to repair, and common in made-to-order workshops — but dents more easily. Ask what the visible panels and the structural frame are each made from; many pieces mix both. For coastal homes, ensure timber is sealed against humidity. This guide covers the timbers you will see most often in Kenyan showrooms and workshops.",
+    author: "Otieno Ochieng",
+    authorSlug: "otieno-ochieng",
+    publishedAt: "2026-02-15",
+    image: "placeholder:art-timber-guide",
+    category: "buying-advice",
+    relatedProductSlugs: ["jomo-dining-table", "mua-hardwood-dining-table", "meru-carved-dining-set"],
+    relatedRetailerSlugs: ["highland-home", "mua-timber-machakos", "meru-woodcraft"],
+    disclosure: "This guide is editorial. No retailer paid for inclusion.",
+    sponsored: false,
+  },
+  {
+    id: "art-011",
+    slug: "rug-and-textile-care",
+    title: "Caring for rugs, cushions and upholstery",
+    excerpt:
+      "Vacuuming routines, stain response and rotation schedules that keep textiles looking new.",
+    body: "Rugs and upholstery wear unevenly when left alone. Rotate rugs every two to three months, vacuum weekly on both sides where possible, and blot — never rub — spills within the first few minutes. Cushion covers washed according to the label last far longer than those left unwashed. For fabric sofas, a professional clean every eighteen months maintains both appearance and hygiene. This guide covers routine care for rugs, cushions and upholstery in Kenyan homes.",
+    author: "Otieno Ochieng",
+    authorSlug: "otieno-ochieng",
+    publishedAt: "2026-02-10",
+    image: "placeholder:art-rug-care",
+    category: "care",
+    relatedProductSlugs: ["rangi-woven-rug", "mavuno-three-seater-sofa", "serena-lounge-chair"],
+    relatedRetailerSlugs: ["westlands-decor", "savanna-seating"],
+    disclosure: "Editorial guide with no commercial relationships.",
     sponsored: false,
   },
 ];
@@ -1916,6 +2565,118 @@ export const REVIEWS: Review[] = [
     verifiedPurchase: true,
     status: "published",
   },
+  {
+    id: "rev-023",
+    retailerId: "ret-015",
+    retailerSlug: "thika-road-furnishers",
+    authorName: "Brian K.",
+    county: "Kiambu",
+    rating: 4,
+    title: "Good value, busy showroom",
+    body: "Prices were the reason we came and the sofa has held up well. The showroom gets crowded on weekends — go on a weekday if you can.",
+    purchasedProduct: "Baraka Three-Seater Sofa",
+    createdAt: "2026-02-19",
+    verifiedPurchase: true,
+    status: "published",
+  },
+  {
+    id: "rev-024",
+    retailerId: "ret-016",
+    retailerSlug: "mua-timber-machakos",
+    authorName: "Grace N.",
+    county: "Machakos",
+    rating: 5,
+    title: "Table built exactly to our size",
+    body: "We sent measurements over WhatsApp and the table arrived exactly as discussed. Finish is even and the hardwood is heavy in a good way.",
+    purchasedProduct: "Mua Hardwood Dining Table",
+    createdAt: "2026-01-30",
+    verifiedPurchase: true,
+    status: "published",
+  },
+  {
+    id: "rev-025",
+    retailerId: "ret-017",
+    retailerSlug: "nyeri-home-store",
+    authorName: "Peter M.",
+    county: "Nyeri",
+    rating: 4,
+    title: "Friendly service, decent sofa",
+    body: "Sofa is comfortable and firm. Delivery to our farm took two days longer than quoted but they called ahead.",
+    purchasedProduct: "Nyeri Two-Seater Lounge Sofa",
+    createdAt: "2026-02-10",
+    verifiedPurchase: true,
+    status: "published",
+  },
+  {
+    id: "rev-026",
+    retailerId: "ret-018",
+    retailerSlug: "kitengela-bargain-furniture",
+    authorName: "Faith A.",
+    county: "Kajiado",
+    rating: 4,
+    title: "Cheap and cheerful",
+    body: "You get what you pay for — the bunk bed is basic but sturdy, and they delivered the same week we ordered.",
+    purchasedProduct: "Kitengela Bunk Bed",
+    createdAt: "2026-02-15",
+    verifiedPurchase: true,
+    status: "published",
+  },
+  {
+    id: "rev-027",
+    retailerId: "ret-019",
+    retailerSlug: "meru-woodcraft",
+    authorName: "Jane W.",
+    county: "Meru",
+    rating: 5,
+    title: "Carving detail is lovely",
+    body: "The carved detailing on the chairs is the reason we bought the set. Lead time was four weeks as quoted.",
+    purchasedProduct: "Meru Carved Dining Set",
+    createdAt: "2026-02-18",
+    verifiedPurchase: true,
+    status: "published",
+  },
+  {
+    id: "rev-028",
+    retailerId: "ret-020",
+    retailerSlug: "lakeside-lighting-kisumu",
+    authorName: "Dennis O.",
+    county: "Kisumu",
+    rating: 5,
+    title: "Pendant transformed the room",
+    body: "Warm light and the woven shade casts a nice pattern. They helped us check the ceiling fitting before ordering.",
+    purchasedProduct: "Lakeside Pendant Lamp",
+    createdAt: "2026-02-08",
+    verifiedPurchase: true,
+    status: "published",
+  },
+  {
+    id: "rev-029",
+    retailerId: "ret-015",
+    retailerSlug: "thika-road-furnishers",
+    authorName: "Samuel K.",
+    county: "Nairobi",
+    rating: 3,
+    title: "Desk is fine, delivery window wide",
+    body: "Desk arrived assembled and is good for the price. The delivery window was four hours so take a day off if you can.",
+    purchasedProduct: "Juja Study Desk",
+    createdAt: "2026-02-05",
+    verifiedPurchase: true,
+    status: "published",
+  },
+  {
+    id: "rev-030",
+    retailerId: "ret-007",
+    retailerSlug: "savanna-seating",
+    authorName: "Lydia M.",
+    county: "Nairobi",
+    rating: 5,
+    title: "Coffee table pairs well",
+    body: "Bought the coffee table to go with a sofa from the same workshop. Steel legs are solid and the top has a nice grain.",
+    purchasedProduct: "Kileleshwa Coffee Table",
+    createdAt: "2026-02-14",
+    verifiedPurchase: true,
+    status: "published",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1967,6 +2728,303 @@ export const PROMOTIONS: Promotion[] = [
     endDate: "2026-05-31",
     active: false,
   },
+  {
+    id: "promo-005",
+    type: "retailer",
+    targetId: "ret-015",
+    targetSlug: "thika-road-furnishers",
+    placement: "search-top",
+    label: "Featured Partner",
+    startDate: "2026-02-01",
+    endDate: "2026-04-30",
+    active: true,
+  },
+  {
+    id: "promo-006",
+    type: "product",
+    targetId: "prod-032",
+    targetSlug: "kitengela-bunk-bed",
+    placement: "category-banner",
+    label: "Sponsored",
+    startDate: "2026-02-15",
+    endDate: "2026-03-31",
+    active: true,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Demo collections / lookbooks (fictional editorial)
+// ---------------------------------------------------------------------------
+
+export const COLLECTIONS: Collection[] = [
+  {
+    id: "col-001",
+    slug: "small-living-room",
+    title: "Small living-room ideas",
+    excerpt:
+      "Compact sofas, low coffee tables and slim storage for Nairobi apartments and bedsitters.",
+    body: "Small living rooms reward restraint. Choose a two-seater or compact L-shape, keep the coffee table low and narrow, and use vertical storage rather than wide sideboards. This collection pulls together pieces that work in rooms under 15 m², with prices last checked on the dates listed.",
+    theme: "room",
+    room: "living-room",
+    productSlugs: ["nyeri-lounge-sofa", "kileleshwa-coffee-table", "uzuri-floor-lamp", "rangi-woven-rug"],
+    retailerSlugs: ["nyeri-home-store", "savanna-seating", "westlands-decor"],
+    curatorNote: "Everything here is under 2 m in its longest dimension.",
+    publishedAt: "2026-02-18",
+    sponsored: false,
+  },
+  {
+    id: "col-002",
+    slug: "under-kes-50000",
+    title: "Furnishing essentials under KSh 50,000",
+    excerpt:
+      "A realistic starter kit — desk, lamp, sideboard and more — all under KSh 50,000 each.",
+    body: "A KSh 50,000 budget covers most single-piece essentials if you shop carefully. This collection lists desks, lamps, sideboards and seating that came in under that mark at their last price check, with the date each price was confirmed.",
+    theme: "budget",
+    budgetBand: "under-25k",
+    productSlugs: ["juja-study-desk", "taa-desk-lamp", "uzuri-floor-lamp", "kiboko-coffee-table", "mbiriti-side-table"],
+    retailerSlugs: ["thika-road-furnishers", "acacia-lighting", "westlands-decor", "coast-living"],
+    curatorNote: "Prices were last checked in January–February 2026. Always confirm before buying.",
+    publishedAt: "2026-02-12",
+    sponsored: false,
+  },
+  {
+    id: "col-003",
+    slug: "bedroom-refresh",
+    title: "Bedroom refresh",
+    excerpt:
+      "Beds, wardrobes and mirrors to update a bedroom without a full refit.",
+    body: "A bedroom refresh usually means a new bed frame, a wardrobe that actually fits, and better lighting. This collection covers made-to-order and in-stock pieces from workshops and showrooms across Kenya.",
+    theme: "room",
+    room: "bedroom",
+    productSlugs: ["nyati-bed", "bahari-two-door-wardrobe", "zawadi-round-mirror", "taa-desk-lamp"],
+    retailerSlugs: ["nzoia-workshop", "mombasa-modern", "pamoja-craft", "acacia-lighting"],
+    publishedAt: "2026-02-08",
+    sponsored: false,
+  },
+  {
+    id: "col-004",
+    slug: "outdoor-living",
+    title: "Outdoor living for the coast and beyond",
+    excerpt:
+      "Weather-resistant lounge sets, patio tables and sun loungers.",
+    body: "Coastal humidity and strong sun punish outdoor furniture. This collection favours powder-coated aluminium, synthetic weave and quick-dry cushions — the materials that survive Mombasa and Kilifi conditions with minimal upkeep.",
+    theme: "style",
+    productSlugs: ["bahari-outdoor-lounge", "shimba-patio-table", "pwani-sun-lounger", "pwani-balcony-set"],
+    retailerSlugs: ["coast-living", "shimba-outdoor"],
+    curatorNote: "All picks use rust-resistant frames and washable or quick-dry cushions.",
+    publishedAt: "2026-02-05",
+    sponsored: false,
+  },
+  {
+    id: "col-005",
+    slug: "home-office-setups",
+    title: "Home-office setups",
+    excerpt:
+      "Desks, ergonomic chairs and lighting for working from home.",
+    body: "A workable home office needs three things: a desk at the right height, a chair that supports your back, and light that does not glare on your screen. This collection covers desks from KSh 8,900 and chairs with adjustable lumbar support.",
+    theme: "room",
+    room: "home-office",
+    productSlugs: ["maisha-desk", "hodari-office-chair", "juja-study-desk", "taa-desk-lamp", "shabab-floor-lamp"],
+    retailerSlugs: ["rift-valley-office", "thika-road-furnishers", "acacia-lighting"],
+    publishedAt: "2026-02-01",
+    sponsored: false,
+  },
+  {
+    id: "col-006",
+    slug: "dining-room-picks",
+    title: "Dining-room picks",
+    excerpt:
+      "Dining tables, bar stools and sideboards for family meals and hosting.",
+    body: "Dining furniture gets daily use, so frame quality and finish matter more than styling. This collection covers made-to-order hardwood tables, in-stock six-seaters and the storage that goes with them.",
+    theme: "room",
+    room: "dining-room",
+    productSlugs: ["jomo-dining-table", "eldoret-six-seat-dining-set", "ahadi-bar-stool-set", "mkate-sideboard", "duka-display-cabinet"],
+    retailerSlugs: ["highland-home", "eldoret-woodworks", "lake-view-furniture"],
+    publishedAt: "2026-01-26",
+    sponsored: false,
+  },
+  {
+    id: "col-007",
+    slug: "made-in-kenya",
+    title: "Made in Kenya",
+    excerpt:
+      "Furniture built by Kenyan workshops — timber, weave and upholstery.",
+    body: "Kenyan workshops produce everything from hand-carved dining sets to upholstered sofas. This collection highlights pieces marked made-in-Kenya by their retailers, spanning Nairobi, Machakos, Meru and Kisumu.",
+    theme: "style",
+    productSlugs: ["meru-carved-dining-set", "mua-hardwood-dining-table", "pamoja-open-bookshelf", "tamu-l-shaped-sofa", "lakeside-pendant-lamp"],
+    retailerSlugs: ["meru-woodcraft", "mua-timber-machakos", "pamoja-craft", "savanna-seating", "lakeside-lighting-kisumu"],
+    curatorNote: "Made-in-Kenya status is self-reported by retailers and not independently verified.",
+    publishedAt: "2026-01-20",
+    sponsored: false,
+  },
+  {
+    id: "col-008",
+    slug: "first-apartment",
+    title: "Your first apartment",
+    excerpt:
+      "The pieces to buy first, in rough priority order, for a first rental or purchase.",
+    body: "Buy in this order: bed, wardrobe, somewhere to sit, somewhere to eat, then lighting and décor. This collection follows that sequence with budget-friendly picks across the catalogue.",
+    theme: "budget",
+    budgetBand: "25k-75k",
+    productSlugs: ["tembo-bunk-bed", "baraka-three-seater-sofa", "juja-study-desk", "taa-desk-lamp", "kiboko-coffee-table"],
+    retailerSlugs: ["nairobi-bed-co", "thika-road-furnishers", "acacia-lighting"],
+    publishedAt: "2026-01-15",
+    sponsored: false,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Demo price history (fictional — demo prices checked on the dates listed)
+// ---------------------------------------------------------------------------
+
+export const PRICE_HISTORY: PriceHistory[] = [
+  { productSlug: "mavuno-three-seater-sofa", points: [
+    { date: "2025-10-01", priceKes: 92000 },
+    { date: "2025-11-15", priceKes: 89000 },
+    { date: "2026-01-10", priceKes: 85000 },
+  ]},
+  { productSlug: "jomo-dining-table", points: [
+    { date: "2025-10-01", priceKes: 39500 },
+    { date: "2025-12-01", priceKes: 42000 },
+  ]},
+  { productSlug: "bahari-outdoor-lounge", points: [
+    { date: "2025-12-01", priceKes: 41000 },
+    { date: "2026-02-03", priceKes: 38000 },
+  ]},
+  { productSlug: "maisha-desk", points: [
+    { date: "2025-11-01", priceKes: 15500 },
+    { date: "2026-01-20", priceKes: 14500 },
+  ]},
+  { productSlug: "mkate-sideboard", points: [
+    { date: "2025-09-01", priceKes: 54000 },
+    { date: "2025-11-05", priceKes: 56000 },
+    { date: "2026-01-22", priceKes: 56000 },
+  ]},
+  { productSlug: "uzuri-floor-lamp", points: [
+    { date: "2025-12-01", priceKes: 7800 },
+    { date: "2026-02-01", priceKes: 7200 },
+  ]},
+  { productSlug: "kitawa-lounge-chair", points: [
+    { date: "2025-11-01", priceKes: 21000 },
+    { date: "2025-12-10", priceKes: 22500 },
+    { date: "2026-01-22", priceKes: 22500 },
+  ]},
+  { productSlug: "tamu-l-shaped-sofa", points: [
+    { date: "2026-01-05", priceKes: 135000 },
+    { date: "2026-02-14", priceKes: 128000 },
+  ]},
+  { productSlug: "hodari-office-chair", points: [
+    { date: "2025-12-01", priceKes: 19500 },
+    { date: "2026-02-10", priceKes: 18500 },
+  ]},
+  { productSlug: "rangi-woven-rug", points: [
+    { date: "2026-01-12", priceKes: 9800 },
+    { date: "2026-02-01", priceKes: 9800 },
+  ]},
+  { productSlug: "baraka-three-seater-sofa", points: [
+    { date: "2026-01-14", priceKes: 34000 },
+    { date: "2026-02-18", priceKes: 32000 },
+  ]},
+  { productSlug: "kitengela-bunk-bed", points: [
+    { date: "2026-02-01", priceKes: 24500 },
+    { date: "2026-02-20", priceKes: 22000 },
+  ]},
+  { productSlug: "tembo-bunk-bed", points: [
+    { date: "2026-02-01", priceKes: 48500 },
+    { date: "2026-02-16", priceKes: 48500 },
+  ]},
+  { productSlug: "juja-study-desk", points: [
+    { date: "2026-01-22", priceKes: 9500 },
+    { date: "2026-02-18", priceKes: 8900 },
+  ]},
+  { productSlug: "acacia-dome-pendant", points: [
+    { date: "2026-01-15", priceKes: 5900 },
+    { date: "2026-01-28", priceKes: 5400 },
+  ]},
+  { productSlug: "lakeside-pendant-lamp", points: [
+    { date: "2026-01-18", priceKes: 4200 },
+    { date: "2026-02-06", priceKes: 4200 },
+  ]},
+];
+
+// ---------------------------------------------------------------------------
+// Demo budget planner rooms (fictional planning guidance)
+// ---------------------------------------------------------------------------
+
+export const PLANNER_ROOMS: PlannerRoom[] = [
+  {
+    id: "planner-001",
+    slug: "studio",
+    name: "Studio / bedsitter",
+    description: "One open room that has to serve as bedroom, living room and often workspace.",
+    essentials: [
+      { label: "Bed or sofa-bed", category: "sofas", minBudget: 18000, tip: "A sofa-bed doubles as guest seating." },
+      { label: "Wardrobe or clothing rail", category: "beds", minBudget: 12000, tip: "Vertical storage saves floor space." },
+      { label: "Small desk", category: "home-office", minBudget: 8000, tip: "A wall desk folds away when not in use." },
+      { label: "Floor or table lamp", category: "lighting", minBudget: 3000, tip: "Layer light instead of one ceiling bulb." },
+      { label: "Rug", category: "decor", minBudget: 5000, tip: "A rug visually separates zones in one room." },
+    ],
+    tips: [
+      "Prioritise multi-functional pieces — sofa-beds, nesting tables, storage stools.",
+      "Measure doorways and stairwells before ordering large items.",
+      "Buy the bed and wardrobe first; add style pieces as budget allows.",
+    ],
+  },
+  {
+    id: "planner-002",
+    slug: "one-bedroom",
+    name: "One-bedroom apartment",
+    description: "Separate bedroom plus a living area — the most common first-home layout.",
+    essentials: [
+      { label: "Bed frame", category: "beds", minBudget: 22000, tip: "Measure the room before choosing king vs double." },
+      { label: "Wardrobe", category: "beds", minBudget: 18000, tip: "Check depth — 55–60 cm for hanging space." },
+      { label: "Sofa", category: "sofas", minBudget: 28000, tip: "Two-seaters suit most one-bedroom living rooms." },
+      { label: "Coffee or side table", category: "sofas", minBudget: 7000, tip: "Lower tables make rooms feel larger." },
+      { label: "Dining table for two", category: "dining", minBudget: 12000, tip: "Drop-leaf tables expand for guests." },
+      { label: "Lighting", category: "lighting", minBudget: 6000, tip: "One pendant plus one task lamp covers most needs." },
+    ],
+    tips: [
+      "Furnish the bedroom first — sleep quality matters more than a perfect living room.",
+      "A rug under the sofa anchors the living zone without extra furniture.",
+      "Check delivery fees before comparing prices across retailers.",
+    ],
+  },
+  {
+    id: "planner-003",
+    slug: "two-bedroom",
+    name: "Two-bedroom family home",
+    description: "Family layout with a shared living/dining area and children's room.",
+    essentials: [
+      { label: "Three-seater sofa", category: "sofas", minBudget: 45000, tip: "Removable covers last longer with children." },
+      { label: "Dining table for four to six", category: "dining", minBudget: 35000, tip: "Solid timber repairs better than MDF." },
+      { label: "Sideboard or display cabinet", category: "storage", minBudget: 25000, tip: "Adjustable shelves adapt as needs change." },
+      { label: "Main bed frame", category: "beds", minBudget: 30000, tip: "Slatted bases improve mattress ventilation." },
+      { label: "Children's bed or bunk", category: "beds", minBudget: 22000, tip: "Guard rails are a safety must for bunks." },
+      { label: "Storage chest or shelves", category: "storage", minBudget: 12000, tip: "Lidded chests hide toys and linen." },
+    ],
+    tips: [
+      "Invest in durable, easy-clean fabrics for shared spaces.",
+      "Bunk beds free floor play space in children's rooms.",
+      "Buy dining and living pieces together for a cohesive look.",
+    ],
+  },
+  {
+    id: "planner-004",
+    slug: "home-office",
+    name: "Home office",
+    description: "A dedicated room or corner for remote work and study.",
+    essentials: [
+      { label: "Desk", category: "home-office", minBudget: 9000, tip: "75 cm height suits most people when seated." },
+      { label: "Ergonomic chair", category: "home-office", minBudget: 15000, tip: "Adjustable lumbar support is worth the extra cost." },
+      { label: "Task lamp", category: "lighting", minBudget: 3000, tip: "Position light opposite your writing hand." },
+      { label: "Shelving or filing", category: "storage", minBudget: 8000, tip: "Wall shelves free desk surface." },
+    ],
+    tips: [
+      "Spend more on the chair than the desk — you sit for hours.",
+      "Cable management trays keep the desk clear and safe.",
+      "Position the desk facing the door or a window, not a blank wall.",
+    ],
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -2010,6 +3068,13 @@ export function getRetailersByCounty(county: string) {
   return RETAILERS.filter((r) => r.county === county);
 }
 
+export function getProductsByCounty(county: string) {
+  const retailerIds = new Set(
+    RETAILERS.filter((r) => r.county === county).map((r) => r.id)
+  );
+  return PRODUCTS.filter((p) => retailerIds.has(p.retailerId));
+}
+
 export function getArticlesByCategory(slug: string) {
   return ARTICLES.filter((a) => a.category === slug);
 }
@@ -2042,6 +3107,63 @@ export function ratingBreakdown(reviews: Review[]) {
     if (counts[review.rating] !== undefined) counts[review.rating] += 1;
   }
   return counts;
+}
+
+export function getCollection(slug: string) {
+  return COLLECTIONS.find((c) => c.slug === slug);
+}
+
+export function getProductsByCollection(slug: string) {
+  const collection = getCollection(slug);
+  if (!collection) return [];
+  return collection.productSlugs
+    .map((s) => PRODUCTS.find((p) => p.slug === s))
+    .filter((p): p is Product => Boolean(p));
+}
+
+export function getRetailersByCollection(slug: string) {
+  const collection = getCollection(slug);
+  if (!collection) return [];
+  return collection.retailerSlugs
+    .map((s) => RETAILERS.find((r) => r.slug === s))
+    .filter((r): r is Retailer => Boolean(r));
+}
+
+export function getCollectionsByRoom(room: string) {
+  return COLLECTIONS.filter((c) => c.room === room);
+}
+
+export function getPriceHistory(productSlug: string): PriceHistory | undefined {
+  return PRICE_HISTORY.find((h) => h.productSlug === productSlug);
+}
+
+export function getPriceChange(history: PriceHistory | undefined): {
+  direction: "down" | "up" | "flat" | "none";
+  changeKes: number | null;
+  changePct: number | null;
+} {
+  if (!history || history.points.length < 2) {
+    return { direction: "none", changeKes: null, changePct: null };
+  }
+  const first = history.points[0].priceKes;
+  const last = history.points[history.points.length - 1].priceKes;
+  if (first === null || last === null) {
+    return { direction: "none", changeKes: null, changePct: null };
+  }
+  const changeKes = last - first;
+  const changePct = first === 0 ? 0 : Math.round((changeKes / first) * 1000) / 10;
+  const direction = changeKes < 0 ? "down" : changeKes > 0 ? "up" : "flat";
+  return { direction, changeKes, changePct };
+}
+
+export function getPlannerRoom(slug: string) {
+  return PLANNER_ROOMS.find((r) => r.slug === slug);
+}
+
+export function estimatePlannerBudget(roomSlug: string): number {
+  const room = getPlannerRoom(roomSlug);
+  if (!room) return 0;
+  return room.essentials.reduce((sum, item) => sum + item.minBudget, 0);
 }
 
 export function formatKes(amount: number | null) {

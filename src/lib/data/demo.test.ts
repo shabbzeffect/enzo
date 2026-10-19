@@ -12,6 +12,9 @@ import {
   REVIEWS,
   AUTHORS,
   ARTICLE_CATEGORIES,
+  COLLECTIONS,
+  PRICE_HISTORY,
+  PLANNER_ROOMS,
   getCategory,
   getProductsByCategory,
   getRetailersByCategory,
@@ -23,6 +26,14 @@ import {
   articleCategoryName,
   averageRating,
   ratingBreakdown,
+  getCollection,
+  getProductsByCollection,
+  getRetailersByCollection,
+  getCollectionsByRoom,
+  getPriceHistory,
+  getPriceChange,
+  getPlannerRoom,
+  estimatePlannerBudget,
 } from "./demo.ts";
 
 // Runs with: node --experimental-strip-types --test src/lib/data/demo.test.ts
@@ -213,4 +224,109 @@ test("getArticlesByCategory filters by category", () => {
     const articles = getArticlesByCategory(category.slug);
     for (const article of articles) assert.strictEqual(article.category, category.slug);
   }
+});
+
+test("COUNTIES seed includes at least 10 counties with towns", () => {
+  assert.ok(COUNTIES.length >= 10, `only ${COUNTIES.length} counties`);
+  for (const county of COUNTIES) {
+    assert.ok(county.towns.length > 0, `${county.name} has no towns`);
+  }
+});
+
+test("catalogue grew: >= 20 retailers, 40 products, 11 articles, 30 reviews", () => {
+  assert.ok(RETAILERS.length >= 20, `only ${RETAILERS.length} retailers`);
+  assert.ok(PRODUCTS.length >= 40, `only ${PRODUCTS.length} products`);
+  assert.ok(ARTICLES.length >= 11, `only ${ARTICLES.length} articles`);
+  assert.ok(REVIEWS.length >= 30, `only ${REVIEWS.length} reviews`);
+});
+
+test("every product has a county-backed retailer", () => {
+  const counties = new Set(COUNTIES.map((c) => c.name));
+  for (const r of RETAILERS) {
+    assert.ok(counties.has(r.county), `${r.slug} county ${r.county} not in COUNTIES`);
+  }
+});
+
+test("COLLECTIONS reference existing products and retailers", () => {
+  assert.ok(COLLECTIONS.length >= 6, `only ${COLLECTIONS.length} collections`);
+  const productSlugs = new Set(PRODUCTS.map((p) => p.slug));
+  const retailerSlugs = new Set(RETAILERS.map((r) => r.slug));
+  for (const collection of COLLECTIONS) {
+    assert.ok(collection.productSlugs.length >= 3, `${collection.slug} too few products`);
+    for (const slug of collection.productSlugs) {
+      assert.ok(productSlugs.has(slug), `${collection.slug} -> ${slug}`);
+    }
+    for (const slug of collection.retailerSlugs) {
+      assert.ok(retailerSlugs.has(slug), `${collection.slug} -> ${slug}`);
+    }
+  }
+});
+
+test("getProductsByCollection and getRetailersByCollection resolve", () => {
+  for (const collection of COLLECTIONS) {
+    const products = getProductsByCollection(collection.slug);
+    const retailers = getRetailersByCollection(collection.slug);
+    assert.strictEqual(products.length, collection.productSlugs.length);
+    assert.strictEqual(retailers.length, collection.retailerSlugs.length);
+  }
+  assert.strictEqual(getProductsByCollection("nope").length, 0);
+});
+
+test("getCollectionsByRoom filters by room", () => {
+  const living = getCollectionsByRoom("living-room");
+  assert.ok(living.length >= 1);
+  for (const c of living) assert.strictEqual(c.room, "living-room");
+});
+
+test("PRICE_HISTORY points are chronological and reference products", () => {
+  const productSlugs = new Set(PRODUCTS.map((p) => p.slug));
+  assert.ok(PRICE_HISTORY.length >= 10, `only ${PRICE_HISTORY.length} histories`);
+  for (const history of PRICE_HISTORY) {
+    assert.ok(productSlugs.has(history.productSlug), history.productSlug);
+    assert.ok(history.points.length >= 1, history.productSlug);
+    for (let i = 1; i < history.points.length; i++) {
+      assert.ok(
+        history.points[i].date >= history.points[i - 1].date,
+        `${history.productSlug} not chronological`
+      );
+    }
+  }
+});
+
+test("getPriceChange computes direction and percentage", () => {
+  const down = getPriceChange(getPriceHistory("mavuno-three-seater-sofa"));
+  assert.strictEqual(down.direction, "down");
+  assert.ok(down.changeKes !== null && down.changeKes < 0);
+  assert.ok(down.changePct !== null && down.changePct < 0);
+
+  const flat = getPriceChange(getPriceHistory("tembo-bunk-bed"));
+  assert.strictEqual(flat.direction, "flat");
+  assert.strictEqual(flat.changeKes, 0);
+
+  const none = getPriceChange(undefined);
+  assert.strictEqual(none.direction, "none");
+  assert.strictEqual(none.changeKes, null);
+});
+
+test("PLANNER_ROOMS have essentials with budgets and tips", () => {
+  assert.ok(PLANNER_ROOMS.length >= 3, `only ${PLANNER_ROOMS.length} rooms`);
+  for (const room of PLANNER_ROOMS) {
+    assert.ok(room.essentials.length >= 3, room.slug);
+    for (const item of room.essentials) {
+      assert.ok(item.minBudget > 0, `${room.slug} -> ${item.label}`);
+      assert.ok(item.tip.length > 10, `${room.slug} -> ${item.label} tip`);
+      assert.ok(
+        CATEGORIES.some((c) => c.slug === item.category),
+        `${room.slug} -> ${item.category}`
+      );
+    }
+  }
+});
+
+test("estimatePlannerBudget sums essential budgets", () => {
+  const studio = estimatePlannerBudget("studio");
+  const room = getPlannerRoom("studio");
+  const expected = room!.essentials.reduce((s, i) => s + i.minBudget, 0);
+  assert.strictEqual(studio, expected);
+  assert.strictEqual(estimatePlannerBudget("nope"), 0);
 });

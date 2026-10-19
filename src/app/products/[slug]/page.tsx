@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getProduct, getRetailer, getReviewsForProduct, getCategory, PRODUCTS, ARTICLES, averageRating, articleCategoryName, formatKes } from "@/lib/data/demo";
+import { getProduct, getRetailer, getReviewsForProduct, getCategory, PRODUCTS, ARTICLES, averageRating, articleCategoryName, formatKes, getPriceHistory } from "@/lib/data/demo";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
@@ -8,6 +8,9 @@ import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
 import { StarRating } from "@/components/ui/rating";
 import { ReviewList, RatingSummary } from "@/components/reviews";
 import { CompareToggle } from "@/components/compare";
+import { SaveToggle } from "@/components/saved";
+import { ProductTracker } from "@/components/product-tracker";
+import { PriceHistoryChart } from "@/components/price-history-chart";
 import Link from "next/link";
 import { ProductImageGallery } from "@/components/product-image-gallery";
 import { SocialShare } from "@/components/social-share";
@@ -50,6 +53,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="space-y-12">
+      <ProductTracker slug={product.slug} />
       <JsonLd type="Product" data={productJsonLd(product)} />
       <nav className="mb-2" aria-label="Breadcrumb">
         <ol className="flex flex-wrap gap-2 text-xs text-muted">
@@ -91,6 +95,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 Price last checked {new Date(product.priceLastChecked).toLocaleDateString("en-KE")}.
                 Prices can change — always confirm with the retailer before buying.
               </p>
+              <PriceHistoryChart history={getPriceHistory(product.slug)} />
             </CardContent>
           </Card>
 
@@ -154,8 +159,9 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                   title={product.name}
                   message={`Hi, I found "${product.name}" (KSh ${product.priceKes?.toLocaleString("en-KE") ?? "Price on request"}) on Nyumba Edit. Could you confirm price and availability?`}
                 />
-                <div className="pt-1">
-                  <CompareToggle slug={product.slug} className="w-full" />
+                <div className="pt-1 flex items-center gap-2">
+                  <CompareToggle slug={product.slug} className="flex-1" />
+                  <SaveToggle slug={product.slug} className="flex-1" />
                 </div>
               </>
             ) : (
