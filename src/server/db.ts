@@ -1,18 +1,11 @@
-// src/server/db.ts
-//
-// Placeholder for the production Prisma client.
-//
-// The public UI runs on clearly-marked demo data (src/lib/data/demo.ts) and
-// works without a database. Wire this file up to @prisma/client after running
-// `prisma generate` against a real DATABASE_URL, then replace demo data fetches
-// with repository functions that query through this client.
-//
-// Never import this file in client components. Secrets (DATABASE_URL) must never
-// be exposed to the browser.
+import { PrismaClient } from "@prisma/client";
 
-export type Db = {
-  [key: string]: unknown;
-};
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
-export const db: Db = {};
-export default db;
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+  log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+});
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+export default prisma;

@@ -11,6 +11,7 @@ import { ProductImageGallery } from "@/components/product-image-gallery";
 import { SocialShare } from "@/components/social-share";
 import { JsonLd } from "@/components/json-ld";
 import { SITE } from "@/lib/site";
+import { EnquiryForm } from "@/components/enquiry-form";
 
 export const metadata = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
@@ -183,6 +184,19 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
         <div className="mt-6">
           <ReviewList reviews={reviews} />
         </div>
+      </section>
+
+      <section id="enquire" className="scroll-mt-20" aria-label="Send enquiry">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-heading text-xl font-bold">Send an enquiry</h2>
+          <span className="text-xs text-muted">Demo form</span>
+        </div>
+        <EnquiryForm
+          retailerSlug={retailer.slug}
+          retailerName={retailer.name}
+          heading="Enquire about products, prices and delivery"
+          intro="Ask about stock, delivery areas, assembly, customisation or prices. In this demo build, enquiries are stored in a demonstration inbox and are not actually delivered."
+        />
       </section>
 
       {products.length > 0 && (

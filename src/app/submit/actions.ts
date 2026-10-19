@@ -1,5 +1,9 @@
 "use server";
 
+import { getStore } from "@/server/demo-store";
+import { addEnquiry } from "@/server/store-core";
+import { isValidEmail, isValidKenyanPhone, normalizeKenyanPhone } from "@/lib/validators";
+
 export interface SubmissionErrors {
   name?: string;
   businessName?: string;
@@ -23,18 +27,6 @@ export interface SubmissionResult {
 const REQUIRED_CATEGORIES = [
   "sofas", "beds", "dining", "storage", "lighting", "decor", "outdoor", "home-office",
 ];
-
-function isValidKenyanPhone(raw: string) {
-  const digits = raw.replace(/\D/g, "");
-  // Accept +254XXXXXXXXX (9 digits after 254) or 07XX/01XX (9 digits after 0)
-  if (digits.startsWith("254")) return digits.length === 12;
-  if (digits.startsWith("0")) return digits.length === 10 && /^[071]/.test(digits);
-  return false;
-}
-
-function isValidEmail(raw: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw);
-}
 
 export async function submitRetailerRequest(formData: FormData): Promise<SubmissionResult> {
   const name = (formData.get("name") || "").toString().trim();
@@ -67,9 +59,24 @@ export async function submitRetailerRequest(formData: FormData): Promise<Submiss
     return { ok: false, message: "Please fix the errors below.", errors };
   }
 
-  // Simulate sending to a backend / admin review queue.
-  // In production, this would insert into a `retailer_requests` table and notify admins.
-  await new Promise((resolve) => setTimeout(resolve, 800));
+  // Record the listing request in the demo admin inbox
+  // (visible at /admin/enquiries). Production: insert into a
+  // `retailer_requests` table and notify admins.
+  addEnquiry(getStore(), {
+    kind: "listing-request",
+    name,
+    phone: normalizeKenyanPhone(phone),
+    email: email || undefined,
+    subject: `Listing request — ${businessName}`,
+    message: [
+      `Business: ${businessName}`,
+      `Location: ${town}, ${county}`,
+      `Categories: ${categories}`,
+      `Website: ${website || "—"}`,
+      "",
+      message,
+    ].join("\n"),
+  });
 
   return {
     ok: true,

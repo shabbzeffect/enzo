@@ -1,6 +1,5 @@
-import { ContactForm } from "@/components/contact-form";
+import { ContactMessageForm } from "@/components/enquiry-form";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export const metadata = {
   title: "Contact Nyumba Edit",
@@ -16,7 +15,7 @@ export default function ContactPage() {
         us a line.
       </p>
 
-      <ContactForm />
+      <ContactMessageForm />
 
       <div className="bg-cream-50 rounded-xl border border-border p-6">
         <h3 className="font-bold text-ink mb-2">WhatsApp channel</h3>

@@ -6,6 +6,7 @@
 // a real DATABASE_URL; this script runs only when a database is configured.
 
 import { PrismaClient } from "@prisma/client";
+import { hash } from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -25,6 +26,7 @@ async function main() {
   });
 
   // ---- Demo admin user (do not use these credentials in production) ----
+  const adminPasswordHash = await hash("admin-demo", 10);
   await prisma.user.upsert({
     where: { email: "admin@example.demo" },
     update: {},
@@ -32,7 +34,7 @@ async function main() {
       email: "admin@example.demo",
       name: "Demo Admin",
       roleId: adminRole.id,
-      passwordHash: "$2b$10$demo.hash.placeholder", // bcrypt placeholder; rotate in production
+      passwordHash: adminPasswordHash,
     },
   });
 

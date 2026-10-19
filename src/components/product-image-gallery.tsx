@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/images";
 
 export type ProductImageGalleryProps = {
   images: string[];
@@ -39,7 +40,7 @@ export function ProductImageGallery({ images, alt, height = 480, className }: Pr
         onMouseEnter={() => setIsZoomed(true)}
       >
         <Image
-          src={images[selectedIndex] || "placeholder:product"}
+          src={getImageUrl(images[selectedIndex] || "placeholder:product")}
           alt={alt}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
@@ -70,7 +71,7 @@ export function ProductImageGallery({ images, alt, height = 480, className }: Pr
               aria-pressed={selectedIndex === i}
             >
               <Image
-                src={img}
+                src={getImageUrl(img)}
                 alt={`${alt} thumbnail ${i + 1}`}
                 fill
                 className="object-cover"
