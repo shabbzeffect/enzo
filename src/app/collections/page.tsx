@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { COLLECTIONS, getProductsByCollection } from "@/lib/data/demo";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Badge, SponsorLabel } from "@/components/ui/badge";
 import { SITE } from "@/lib/site";
 

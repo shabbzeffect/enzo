@@ -17,7 +17,6 @@ export default function AdminDashboardPage() {
   const promotions = store.promotions;
   const enquiries = store.enquiries;
 
-  const sponsoredRetailers = retailers.filter((r) => r.sponsored).length;
   const activePromotions = promotions.filter((p) => p.active).length;
   const pendingReviews = reviews.filter((r) => r.status === "pending").length;
   const newEnquiries = enquiries.filter((e) => e.status === "new").length;

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { phone, amount, accountReference, transactionDesc, retailerSlug, productSlug } = body;
+    const { phone, amount, accountReference, transactionDesc } = body;
 
     if (!phone || !amount || !accountReference) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -32,10 +32,11 @@ export async function POST(request: Request) {
       responseCode: result.ResponseCode,
       responseDescription: result.ResponseDescription,
     });
-  } catch (error: any) {
-    console.error("STK Push error:", error.response?.data || error.message);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { errorMessage?: string } }; message?: string };
+    console.error("STK Push error:", err.response?.data || err.message);
     return NextResponse.json(
-      { error: error.response?.data?.errorMessage || error.message || "STK Push failed" },
+      { error: err.response?.data?.errorMessage || err.message || "STK Push failed" },
       { status: 500 }
     );
   }

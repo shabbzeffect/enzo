@@ -25,8 +25,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = React.useState<Theme>("system");
   const [resolved, setResolved] = React.useState<"light" | "dark">("light");
   const [mounted, setMounted] = React.useState(false);
+  const mountedRef = React.useRef(true);
 
   React.useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (!mountedRef.current) return;
     setMounted(true);
     const stored = getStoredTheme();
     setTheme(stored);
@@ -34,7 +42,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   React.useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !mountedRef.current) return;
     const resolvedTheme = resolveTheme(theme);
     setResolved(resolvedTheme);
     const root = window.document.documentElement;

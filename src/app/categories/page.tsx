@@ -23,7 +23,6 @@ export const metadata: Metadata = {
 
 export default function CategoriesPage() {
   const counties = COUNTIES.map((county) => {
-    const towns = county.towns.map((t) => t.name);
     const retailers = RETAILERS.filter((r) => r.county === county.name);
     return { name: county.name, count: retailers.length };
   }).filter((c) => c.count > 0);

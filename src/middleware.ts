@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
 
   const session = await auth();
 
-  if (!session || (session.user as any)?.role !== "admin") {
+  if (!session || session.user?.role !== "admin") {
     const loginUrl = new URL("/admin/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);

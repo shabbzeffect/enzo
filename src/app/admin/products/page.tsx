@@ -103,7 +103,7 @@ export default function AdminProductsPage() {
         <h3 className="font-bold text-foreground mb-2">Notes</h3>
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
           <li>Archived products disappear from the public catalogue, search, retailer pages and collections immediately.</li>
-          <li>Price confirmation sets "Price confirmed" badge and today's date as last checked.</li>
+          <li>Price confirmation sets &ldquo;Price confirmed&rdquo; badge and today&apos;s date as last checked.</li>
           <li>Availability options: in-stock, made-to-order, unavailable, unknown.</li>
           <li>Changes are held in process memory for this demo; connect the Prisma database layer to persist them.</li>
         </ul>
@@ -128,7 +128,7 @@ function ProductForm({ product }: { product: ReturnType<typeof getStore>["produc
         />
       </label>
       <label className="block text-xs font-semibold text-foreground">
-        Price (KSh) — leave blank for "on request"
+        Price (KSh) &mdash; leave blank for &ldquo;on request&rdquo;
         <input
           name="priceKes"
           type="number"

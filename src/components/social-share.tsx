@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { parseKenyanPhone, whatsappLink } from "@/lib/data/demo";
+import { whatsappLink } from "@/lib/data/demo";
 
 export type ShareProps = {
   url: string;

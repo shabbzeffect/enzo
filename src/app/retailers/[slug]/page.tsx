@@ -1,13 +1,12 @@
 import { notFound } from "next/navigation";
 import { getRetailer, getProductsByRetailer, getReviewsByRetailer, averageRating } from "@/lib/data/demo";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { StarRating } from "@/components/ui/rating";
 import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
 import { ReviewList, RatingSummary } from "@/components/reviews";
 import Link from "next/link";
-import { ProductImageGallery } from "@/components/product-image-gallery";
 import { SocialShare } from "@/components/social-share";
 import { JsonLd } from "@/components/json-ld";
 import { SITE } from "@/lib/site";
@@ -218,7 +217,7 @@ export default async function RetailerProfilePage({ params }: { params: Promise<
   );
 }
 
-function ProductCard({ p }: { p: any }) {
+function ProductCard({ p }: { p: { id: string; slug: string; name: string; description: string; priceKes: number | null; priceOnRequest: boolean; images: string[]; retailerName: string; retailerSlug: string } }) {
   return (
     <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
       <div className="relative h-40 overflow-hidden rounded-lg bg-cream-100">

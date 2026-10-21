@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { searchRetailersDemo, COUNTIES, CATEGORIES } from "@/app/retailers/actions";
+import { searchRetailersDemo, COUNTIES, CATEGORIES, type RetailerSearchParams } from "@/app/retailers/actions";
+import { type Retailer } from "@/lib/data/demo";
 import { Card } from "@/components/ui/card";
-import { Badge, SponsorLabel } from "@/components/ui/badge";
+import { SponsorLabel } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/form";
 import { WhatsAppButton } from "@/components/ui/whatsapp";
@@ -15,36 +16,41 @@ export default function RetailersClient() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
-  const [retailers, setRetailers] = useState<any[]>([]);
+  const [retailers, setRetailers] = useState<Retailer[]>([]);
   const [count, setCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [openFilter, setOpenFilter] = useState(false);
+  const mountedRef = useRef(true);
 
-  const [filters, setFilters] = useState({
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  const [filters, setFilters] = useState<RetailerSearchParams>({
     q: searchParams.get("q") || "",
     county: searchParams.get("county") || "",
     category: searchParams.get("category") || "",
   });
 
-  const runSearch = async (p: any) => {
+  const runSearch = async (p: RetailerSearchParams) => {
+    if (!mountedRef.current) return;
     setError(null);
     try {
       const data = await searchRetailersDemo(p);
+      if (!mountedRef.current) return;
       startTransition(() => {
         setRetailers(data.retailers);
         setCount(data.count);
       });
     } catch {
+      if (!mountedRef.current) return;
       setError("Unable to load retailers. Please try again.");
     }
   };
 
-  useEffect(() => {
-    runSearch(filters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
-
-  const nav = (p: any) => {
+  const nav = (p: RetailerSearchParams) => {
     const sp = new URLSearchParams();
     if (p.q) sp.set("q", p.q);
     if (p.county) sp.set("county", p.county);
@@ -67,7 +73,7 @@ export default function RetailersClient() {
             onSubmit={(e) => {
               e.preventDefault();
               const form = new FormData(e.currentTarget);
-              const p: any = {
+              const p: RetailerSearchParams = {
                 q: (form.get("q") as string) || "",
                 county: (form.get("county") as string) || "",
                 category: (form.get("category") as string) || "",
@@ -180,7 +186,7 @@ export default function RetailersClient() {
   );
 }
 
-function RetailerCard({ r }: { r: any }) {
+function RetailerCard({ r }: { r: Retailer }) {
   return (
     <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
       {r.sponsored && <SponsorLabel className="absolute top-4 left-4 z-10">{r.sponsorLabel}</SponsorLabel>}

@@ -12,26 +12,26 @@ export default function AdvertisePage() {
       <p className="text-muted leading-relaxed">
         Nyumba Edit offers sponsored placements and Featured Partner listings for
         furniture retailers and homeware brands wanting to reach Kenyan shoppers.
-        All paid placements are clearly labelled "Sponsored" or "Featured Partner"
+        All paid placements are clearly labelled &ldquo;Sponsored&rdquo; or &ldquo;Featured Partner&rdquo;
         and are kept separate from our editorial recommendations.
       </p>
 
       <h2 className="font-heading text-xl font-bold mt-6">Placement options</h2>
       <ul className="text-muted leading-relaxed space-y-3 list-disc list-inside">
         <li>
-          <strong>Homepage hero placement</strong> — featured retailer at the top
-          of the homepage, labelled "Featured Partner".
+          <strong>Homepage hero placement</strong> &mdash; featured retailer at the top
+          of the homepage, labelled &ldquo;Featured Partner&rdquo;.
         </li>
         <li>
-          <strong>Search-top placement</strong> — labelled "Sponsored" retailer or
+          <strong>Search-top placement</strong> &mdash; labelled &ldquo;Sponsored&rdquo; retailer or
           product at the top of search results.
         </li>
         <li>
-          <strong>Category banner</strong> — labelled placement on category browse
+          <strong>Category banner</strong> &mdash; labelled placement on category browse
           pages.
         </li>
         <li>
-          <strong>Sponsored guide mention</strong> — labelled retailer mention
+          <strong>Sponsored guide mention</strong> &mdash; labelled retailer mention
           within an editorial guide, with a commercial disclosure.
         </li>
       </ul>

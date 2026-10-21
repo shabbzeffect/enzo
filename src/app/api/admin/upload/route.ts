@@ -2,10 +2,18 @@ import { auth } from "@/auth";
 import { cloudinaryUpload } from "@/lib/cloudinary";
 import { NextResponse } from "next/server";
 
+interface CloudinaryUploadResult {
+  public_id: string;
+  secure_url: string;
+  width: number;
+  height: number;
+  format: string;
+}
+
 export async function POST(request: Request) {
   const session = await auth();
 
-  if (!session || (session.user as any)?.role !== "admin") {
+  if (!session || session.user?.role !== "admin") {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -21,7 +29,7 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const result = await new Promise((resolve, reject) => {
+    const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
       cloudinaryUpload
         .upload_stream(
           {
@@ -32,7 +40,7 @@ export async function POST(request: Request) {
           },
           (error, result) => {
             if (error) reject(error);
-            else resolve(result);
+            else resolve(result as CloudinaryUploadResult);
           }
         )
         .end(buffer);
@@ -40,11 +48,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      publicId: (result as any).public_id,
-      url: (result as any).secure_url,
-      width: (result as any).width,
-      height: (result as any).height,
-      format: (result as any).format,
+      publicId: result.public_id,
+      url: result.secure_url,
+      width: result.width,
+      height: result.height,
+      format: result.format,
     });
   } catch (error) {
     console.error("Upload error:", error);

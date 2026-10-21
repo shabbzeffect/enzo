@@ -17,7 +17,7 @@ export default function AboutPage() {
       <p className="text-muted leading-relaxed">
         We are not a marketplace. There is no checkout and we do not process
         payments. Shoppers contact retailers directly — by phone, WhatsApp or
-        through a retailer's own channels — to confirm price, stock, delivery
+        through a retailer&apos;s own channels — to confirm price, stock, delivery
         and customisation.
       </p>
       <h2 className="font-heading text-xl font-bold mt-6">Our approach</h2>
@@ -25,7 +25,7 @@ export default function AboutPage() {
         <li>Prices are shown in Kenyan shillings (KSh); dimensions in centimetres (cm).</li>
         <li>Phone numbers are shown in +254 format, with WhatsApp and call buttons where a retailer supplies a number.</li>
         <li>Retailers can be based in any Kenyan county — not just Nairobi.</li>
-        <li>Paid placements are clearly labelled "Sponsored" or "Featured Partner" and are kept separate from editorial recommendations.</li>
+        <li>Paid placements are clearly labelled &ldquo;Sponsored&rdquo; or &ldquo;Featured Partner&rdquo; and are kept separate from editorial recommendations.</li>
         <li>We do not invent reviews, prices, addresses or endorsements. Sample content is clearly marked as demo data.</li>
       </ul>
       <Link href="/contact" className="rounded-xl border border-border bg-white px-5 py-2.5 text-sm font-semibold text-green-800 hover:bg-cream-100 transition-colors focus-visible-ring inline-block">Contact us</Link>

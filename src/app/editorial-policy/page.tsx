@@ -17,14 +17,14 @@ export default function EditorialPolicyPage() {
       <p className="text-muted leading-relaxed">
         Our buying guides, room inspiration and retailer recommendations are
         produced by the editorial team. Retailers cannot pay to appear in
-        editorial "best of" lists or to receive favourable coverage.
+        editorial &ldquo;best of&rdquo; lists or to receive favourable coverage.
       </p>
 
       <h2 className="font-heading text-xl font-bold mt-6">2. Paid placement</h2>
       <p className="text-muted leading-relaxed">
-        Paid opportunities — retailer listings, Featured Partner slots and
-        sponsored content — are always labelled "Sponsored" or "Featured
-        Partner". Labels appear next to the placement, not hidden in a
+        Paid opportunities &mdash; retailer listings, Featured Partner slots and
+        sponsored content &mdash; are always labelled &ldquo;Sponsored&rdquo; or &ldquo;Featured
+        Partner&rdquo;. Labels appear next to the placement, not hidden in a
         footnote.
       </p>
 

@@ -4,9 +4,7 @@ import Link from "next/link";
 import { CATEGORIES, RETAILERS, ARTICLES, PROMOTIONS } from "@/lib/data/demo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge, SponsorLabel } from "@/components/ui/badge";
-import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
-import { WhatsAppButton } from "@/components/ui/whatsapp";
 import { Input, Select } from "@/components/ui/form";
 import { RecentlyViewedSection } from "@/components/recently-viewed";
 
@@ -18,7 +16,6 @@ export const metadata = {
 const ACTIVE_PROMOTIONS = PROMOTIONS.filter((p) => p.active);
 
 export default function HomePage() {
-  const featuredRetailers = RETAILERS.filter((r) => r.sponsored).slice(0, 3);
   const recentArticles = ARTICLES.slice(0, 3);
   const homeRetailers = RETAILERS.slice(0, 6);
 
@@ -44,7 +41,7 @@ export default function HomePage() {
                 <a href="/discover">Start searching</a>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <a href="/retailers">Browse retailers</a>
+                <Link href="/retailers">Browse retailers</Link>
               </Button>
             </div>
           </div>

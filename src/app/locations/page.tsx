@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { COUNTIES, getRetailersByCounty, getProductsByCounty } from "@/lib/data/demo";
-import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Shop by location",

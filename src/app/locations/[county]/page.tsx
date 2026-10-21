@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COUNTIES, getRetailersByCounty, getProductsByCounty, averageRating, getReviewsByRetailer, formatKes } from "@/lib/data/demo";
+import { COUNTIES, getRetailersByCounty, getProductsByCounty, averageRating, getReviewsByRetailer } from "@/lib/data/demo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge, SponsorLabel } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";

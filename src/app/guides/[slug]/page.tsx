@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
 import { getArticle, getProduct, articleCategoryName } from "@/lib/data/demo";
 import Link from "next/link";
-import { Card, CardImage } from "@/components/ui/card";
+import { CardImage } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
-import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/json-ld";
 import { SITE, absolutePath } from "@/lib/site";
 

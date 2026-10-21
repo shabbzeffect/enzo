@@ -10,7 +10,7 @@ cloudinary.config({
 export const cloudinaryUpload = cloudinary.uploader;
 export const cloudinaryApi = cloudinary.api;
 
-export function getCloudinaryUrl(publicId: string, options?: Record<string, any>) {
+export function getCloudinaryUrl(publicId: string, options?: Record<string, unknown>) {
   return cloudinary.url(publicId, {
     secure: true,
     ...options,

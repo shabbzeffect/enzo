@@ -24,10 +24,6 @@ export interface SubmissionResult {
   errors?: SubmissionErrors;
 }
 
-const REQUIRED_CATEGORIES = [
-  "sofas", "beds", "dining", "storage", "lighting", "decor", "outdoor", "home-office",
-];
-
 export async function submitRetailerRequest(formData: FormData): Promise<SubmissionResult> {
   const name = (formData.get("name") || "").toString().trim();
   const businessName = (formData.get("businessName") || "").toString().trim();

@@ -122,7 +122,7 @@ export default function AdminEnquiriesPage() {
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
           <li>Enquiries are stored in process memory for this demo; they reset when the server restarts.</li>
           <li>In production, connect the Prisma Enquiry model and add email/WhatsApp notifications.</li>
-          <li>The "Add demo enquiry" button seeds a sample entry for testing the inbox UI.</li>
+          <li>The &ldquo;Add demo enquiry&rdquo; button seeds a sample entry for testing the inbox UI.</li>
         </ul>
       </div>
     </div>

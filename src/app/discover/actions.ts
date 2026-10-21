@@ -1,6 +1,6 @@
 "use server";
 
-import { PRODUCTS, RETAILERS, ARTICLES, CATEGORIES, COUNTIES } from "@/lib/data/demo";
+import { PRODUCTS, RETAILERS, ARTICLES, CATEGORIES, COUNTIES, type Product, type Retailer, type Article } from "@/lib/data/demo";
 
 export type SearchResultType = "products" | "retailers" | "articles";
 
@@ -33,7 +33,7 @@ export async function searchDemo(params: SearchParams) {
   const customization = params.customization === "true";
   const sort = params.sort || "relevance";
 
-  const results: { type: SearchResultType; item: any }[] = [];
+  const results: { type: SearchResultType; item: Product | Retailer | Article }[] = [];
 
   if (type === "products" || type === "retailers" || type === "articles") {
     if (type === "products") {
@@ -70,7 +70,7 @@ export async function searchDemo(params: SearchParams) {
       items.forEach((r) => results.push({ type: "retailers", item: r }));
     }
     if (type === "articles") {
-      let items = ARTICLES.filter((a) => {
+      const items = ARTICLES.filter((a) => {
         if (q) {
           const haystack = [a.title, a.excerpt, a.category].join(" ").toLowerCase();
           return haystack.includes(q);
@@ -85,7 +85,7 @@ export async function searchDemo(params: SearchParams) {
   return { results, count: results.length, params };
 }
 
-function sortResults(items: any[], sort: string) {
+function sortResults(items: Product[], sort: string) {
   return [...items].sort((a, b) => {
     if (sort === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     if (sort === "price-asc") {
@@ -102,7 +102,7 @@ function sortResults(items: any[], sort: string) {
   });
 }
 
-function sortRetailers(items: any[], sort: string) {
+function sortRetailers(items: Retailer[], sort: string) {
   return [...items].sort((a, b) => {
     if (sort === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     return 0;

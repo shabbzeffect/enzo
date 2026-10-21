@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 
 interface ImageUploadProps {
   onUpload: (publicId: string, url: string) => void;

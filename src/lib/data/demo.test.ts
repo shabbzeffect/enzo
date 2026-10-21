@@ -26,7 +26,6 @@ import {
   articleCategoryName,
   averageRating,
   ratingBreakdown,
-  getCollection,
   getProductsByCollection,
   getRetailersByCollection,
   getCollectionsByRoom,

@@ -12,7 +12,7 @@ export default function NotFound() {
     <div className="max-w-2xl mx-auto space-y-8 text-center py-16">
       <h1 className="font-heading text-3xl md:text-4xl font-bold text-ink">Page not found</h1>
       <p className="text-muted text-lg">
-        We couldn't find the page you're looking for. It may have moved or been removed.
+        We couldn&apos;t find the page you&apos;re looking for. It may have moved or been removed.
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link href="/" className="rounded-xl border border-border bg-white px-5 py-2.5 text-sm font-semibold text-green-800 hover:bg-cream-100 transition-colors focus-visible-ring inline-block">

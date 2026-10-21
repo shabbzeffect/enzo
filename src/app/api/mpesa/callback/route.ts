@@ -16,17 +16,17 @@ export async function POST(request: Request) {
     const { checkoutRequestId, resultCode, resultDesc, callbackMetadata } = validated;
 
     if (resultCode === 0) {
-      const mpesaReceiptNumber = callbackMetadata.MpesaReceiptNumber;
-      const transactionDate = callbackMetadata.TransactionDate;
-      const phoneNumber = callbackMetadata.PhoneNumber;
-      const amount = callbackMetadata.Amount;
+      const mpesaReceiptNumber = String(callbackMetadata.MpesaReceiptNumber);
+      const transactionDate = String(callbackMetadata.TransactionDate);
+      const phoneNumber = String(callbackMetadata.PhoneNumber);
+      const amount = Number(callbackMetadata.Amount);
 
       await prisma.enquiry.updateMany({
         where: { mpesaCheckoutRequestId: checkoutRequestId },
         data: {
           mpesaReceiptNumber,
-          mpesaTransactionDate: new Date(transactionDate.toString()),
-          mpesaPhoneNumber: phoneNumber.toString(),
+          mpesaTransactionDate: new Date(transactionDate),
+          mpesaPhoneNumber: phoneNumber,
           mpesaAmount: amount,
           status: "paid",
         },

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Textarea, Checkbox } from "@/components/ui/form";
 import { submitRetailerRequest, type SubmissionErrors } from "@/app/submit/actions";
@@ -180,12 +179,12 @@ export default function SubmitPage() {
         </form>
       </Card>
 
-      <div className="bg-cream-50 rounded-xl border border-border p-6">
+<div className="bg-cream-50 rounded-xl border border-border p-6">
         <h3 className="font-bold text-foreground mb-2">What happens next?</h3>
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
           <li>Our editorial team reviews your request within a few business days.</li>
-          <li>If accepted, we’ll contact you to confirm details and publish your profile.</li>
-          <li>Paid "Featured Partner" placements are available separately and are always labelled.</li>
+          <li>If accepted, we&apos;ll contact you to confirm details and publish your profile.</li>
+          <li>Paid &ldquo;Featured Partner&rdquo; placements are available separately and are always labelled.</li>
         </ul>
       </div>
     </div>

@@ -1,9 +1,8 @@
 import { notFound } from "next/navigation";
-import { getProduct, getRetailer, getReviewsForProduct, getCategory, PRODUCTS, ARTICLES, averageRating, articleCategoryName, formatKes, getPriceHistory } from "@/lib/data/demo";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { getProduct, getRetailer, getReviewsForProduct, getCategory, PRODUCTS, ARTICLES, averageRating, articleCategoryName, getPriceHistory } from "@/lib/data/demo";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
-import { Button } from "@/components/ui/button";
 import { WhatsAppButton, CallButton } from "@/components/ui/whatsapp";
 import { StarRating } from "@/components/ui/rating";
 import { ReviewList, RatingSummary } from "@/components/reviews";

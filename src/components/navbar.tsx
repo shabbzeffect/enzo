@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { DarkModeToggle } from "@/components/ui/theme";
-import { Button } from "@/components/ui/button";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 import { SavedCount } from "@/components/saved";
 

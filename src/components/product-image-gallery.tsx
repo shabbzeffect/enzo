@@ -11,7 +11,7 @@ export type ProductImageGalleryProps = {
   className?: string;
 };
 
-export function ProductImageGallery({ images, alt, height = 480, className }: ProductImageGalleryProps) {
+export function ProductImageGallery({ images, alt, className }: ProductImageGalleryProps) {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [isZoomed, setIsZoomed] = React.useState(false);
   const [zoomPosition, setZoomPosition] = React.useState<{ x: number; y: number }>({ x: 0, y: 0 });

@@ -19,8 +19,8 @@ export default function AdminPromotionsPage() {
       <div>
         <h1 className="font-heading text-2xl md:text-3xl font-bold">Manage sponsored placements</h1>
         <p className="text-muted text-sm">
-          {promotions.length} placements · {promotions.filter((p) => p.active).length} active.
-          All paid placements must be labelled "Sponsored" or "Featured Partner"
+          {promotions.length} placements &middot; {promotions.filter((p) => p.active).length} active.
+          All paid placements must be labelled &ldquo;Sponsored&rdquo; or &ldquo;Featured Partner&rdquo;
           and are kept separate from editorial recommendations.
         </p>
         <Link href="/admin" className="text-sm text-primary hover:underline">&larr; Back to dashboard</Link>
@@ -91,7 +91,7 @@ export default function AdminPromotionsPage() {
       <div className="rounded-xl border border-border bg-cream-50 p-6">
         <h3 className="font-bold text-foreground mb-2">Disclosure requirements</h3>
         <ul className="text-sm text-muted space-y-2 list-disc list-inside">
-          <li>Every paid placement must carry a "Sponsored" or "Featured Partner" label next to the placement.</li>
+          <li>Every paid placement must carry a &ldquo;Sponsored&rdquo; or &ldquo;Featured Partner&rdquo; label next to the placement.</li>
           <li>Labels must not be hidden in footnotes or terms and conditions.</li>
           <li>Promotion start and end dates control when a placement is displayed on the public site.</li>
         </ul>

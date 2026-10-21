@@ -55,7 +55,7 @@ export async function stkPush(params: {
 }
 
 export function formatPhone(phone: string): string {
-  let cleaned = phone.replace(/\D/g, "");
+  const cleaned = phone.replace(/\D/g, "");
   if (cleaned.startsWith("254")) return cleaned;
   if (cleaned.startsWith("0")) return "254" + cleaned.slice(1);
   if (cleaned.startsWith("7") || cleaned.startsWith("1")) return "254" + cleaned;
@@ -81,7 +81,30 @@ export async function queryTransaction(checkoutRequestId: string) {
   return response.data;
 }
 
-export function validateCallback(data: any) {
+interface MpesaCallbackMetadataItem {
+  Name: string;
+  Value: string | number;
+}
+
+interface MpesaCallback {
+  MerchantRequestID: string;
+  CheckoutRequestID: string;
+  ResultCode: number;
+  ResultDesc: string;
+  CallbackMetadata?: {
+    Item?: MpesaCallbackMetadataItem[];
+  };
+}
+
+interface MpesaCallbackBody {
+  stkCallback?: MpesaCallback;
+}
+
+interface MpesaCallbackData {
+  Body?: MpesaCallbackBody;
+}
+
+export function validateCallback(data: MpesaCallbackData) {
   if (!data.Body?.stkCallback) return null;
   const callback = data.Body.stkCallback;
   return {
@@ -89,7 +112,7 @@ export function validateCallback(data: any) {
     checkoutRequestId: callback.CheckoutRequestID,
     resultCode: callback.ResultCode,
     resultDesc: callback.ResultDesc,
-    callbackMetadata: callback.CallbackMetadata?.Item?.reduce((acc: any, item: any) => {
+    callbackMetadata: callback.CallbackMetadata?.Item?.reduce((acc: Record<string, string | number>, item: MpesaCallbackMetadataItem) => {
       acc[item.Name] = item.Value;
       return acc;
     }, {}) || {},

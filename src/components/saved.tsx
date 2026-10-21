@@ -28,15 +28,24 @@ function sanitize(value: unknown): string[] {
 export function SavedProvider({ children }: { children: React.ReactNode }) {
   const [slugs, setSlugs] = React.useState<string[]>([]);
   const [ready, setReady] = React.useState(false);
+  const mountedRef = React.useRef(true);
+
+  React.useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   React.useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) setSlugs(sanitize(JSON.parse(raw)));
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (raw && mountedRef.current) setSlugs(sanitize(JSON.parse(raw)));
     } catch {
       // corrupted or unavailable storage — start empty
     }
-    setReady(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (mountedRef.current) setReady(true);
   }, []);
 
   React.useEffect(() => {

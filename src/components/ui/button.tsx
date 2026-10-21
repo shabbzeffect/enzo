@@ -66,7 +66,7 @@ export function Button({
   };
 
   if (asChild) {
-    const child = children as unknown as React.ReactElement<any>;
+    const child = children as React.ReactElement<Record<string, unknown>>;
     return React.cloneElement(child, {
       ...buttonProps,
       className: [
@@ -76,7 +76,7 @@ export function Button({
         .filter(Boolean)
         .join(" "),
       disabled: buttonProps.disabled,
-    } as React.Attributes);
+    } as Record<string, unknown>);
   }
 
   return (

@@ -1,20 +1,18 @@
 "use client";
 
-import { useEffect, useState, useTransition, useCallback } from "react";
+import { useEffect, useState, useTransition, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { searchDemo, CATEGORIES, COUNTIES, type SearchParams } from "@/app/discover/actions";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge, SponsorLabel } from "@/components/ui/badge";
+import { searchDemo, CATEGORIES, COUNTIES, type SearchParams, type SearchResultType } from "@/app/discover/actions";
+import { type Product, type Retailer, type Article } from "@/lib/data/demo";
+import { Card } from "@/components/ui/card";
+import { SponsorLabel } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
 import { Button } from "@/components/ui/button";
 import { Input, Select, Checkbox } from "@/components/ui/form";
 import { WhatsAppButton } from "@/components/ui/whatsapp";
 
-type Result = { type: string; item: any };
-
-const STYLE_OPTIONS = ["Modern", "Traditional", "Scandinavian", "Industrial", "Rustic"];
-const MATERIAL_OPTIONS = ["Timber", "Metal", "MDF", "Fabric", "Leather", "Rattan"];
+type Result = { type: SearchResultType; item: Product | Retailer | Article };
 
 export default function DiscoverClient() {
   const router = useRouter();
@@ -26,10 +24,17 @@ export default function DiscoverClient() {
   const [count, setCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [openFilter, setOpenFilter] = useState(false);
-  const [activeTab, setActiveTab] = useState<"products" | "retailers" | "articles">("products");
+  const [activeTab, setActiveTab] = useState<SearchResultType>("products");
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const initialQ = searchParams.get("q") || "";
-  const initialType = (searchParams.get("type") as any) || "products";
+  const initialType = (searchParams.get("type") as SearchResultType) || "products";
   const initialCategory = searchParams.get("category") || "";
   const initialCounty = searchParams.get("county") || "";
   const initialMin = searchParams.get("minPrice") || "";
@@ -37,9 +42,9 @@ export default function DiscoverClient() {
   const initialDelivery = searchParams.get("delivery") || "";
   const initialAssembly = searchParams.get("assembly") || "";
   const initialCustomization = searchParams.get("customization") || "";
-  const initialSort = (searchParams.get("sort") as any) || "relevance";
+  const initialSort = (searchParams.get("sort") as SearchParams["sort"]) || "relevance";
 
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<SearchParams>({
     q: initialQ,
     type: initialType,
     category: initialCategory,
@@ -53,14 +58,17 @@ export default function DiscoverClient() {
   });
 
   const runSearch = useCallback(async (params: SearchParams) => {
+    if (!mountedRef.current) return;
     setError(null);
     try {
       const data = await searchDemo(params);
+      if (!mountedRef.current) return;
       startTransition(() => {
         setResults(data.results);
         setCount(data.count);
       });
-    } catch (err) {
+    } catch {
+      if (!mountedRef.current) return;
       setError("Unable to load results. Please try again.");
       setResults([]);
       setCount(0);
@@ -128,7 +136,7 @@ export default function DiscoverClient() {
                 delivery: form.get("delivery") as string,
                 assembly: form.get("assembly") as string,
                 customization: form.get("customization") as string,
-                sort: (form.get("sort") as any) || "relevance",
+                sort: (form.get("sort") as SearchParams["sort"]) || "relevance",
               };
               setFilters(params as typeof filters);
               nav(params);
@@ -231,7 +239,7 @@ export default function DiscoverClient() {
             <select
               defaultValue={filters.sort}
               onChange={(e) => {
-                const sort = e.target.value as any;
+                const sort = e.target.value as SearchParams["sort"];
                 setFilters((prev) => ({ ...prev, sort }));
                 nav({ ...filters, sort });
               }}
@@ -245,9 +253,9 @@ export default function DiscoverClient() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredByType.map((result) => {
-              if (result.type === "products") return <ProductCard key={result.item.id} p={result.item} />;
-              if (result.type === "retailers") return <RetailerCard key={result.item.id} r={result.item} />;
-              return <ArticleCard key={result.item.id} a={result.item} />;
+              if (result.type === "products") return <ProductCard key={result.item.id} p={result.item as Product} />;
+              if (result.type === "retailers") return <RetailerCard key={result.item.id} r={result.item as Retailer} />;
+              return <ArticleCard key={result.item.id} a={result.item as Article} />;
             })}
           </div>
           </>
@@ -390,7 +398,7 @@ export default function DiscoverClient() {
   );
 }
 
-function ProductCard({ p }: { p: any }) {
+function ProductCard({ p }: { p: Product }) {
   const retailer = p.retailerName;
   return (
     <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
@@ -421,7 +429,7 @@ function ProductCard({ p }: { p: any }) {
   );
 }
 
-function RetailerCard({ r }: { r: any }) {
+function RetailerCard({ r }: { r: Retailer }) {
   return (
     <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
       {r.sponsored && <SponsorLabel className="absolute top-4 left-4 z-10">{r.sponsorLabel}</SponsorLabel>}
@@ -466,7 +474,7 @@ function TabButton({
   );
 }
 
-function ArticleCard({ a }: { a: any }) {
+function ArticleCard({ a }: { a: Article }) {
   return (
     <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
       {a.sponsored && <SponsorLabel className="mb-3">{a.sponsorLabel || "Sponsored"}</SponsorLabel>}
