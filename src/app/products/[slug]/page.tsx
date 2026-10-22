@@ -15,6 +15,59 @@ import { ProductImageGallery } from "@/components/product-image-gallery";
 import { SocialShare } from "@/components/social-share";
 import { JsonLd } from "@/components/json-ld";
 import { SITE } from "@/lib/site";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+
+function productJsonLd(p: typeof PRODUCTS[number]) {
+  return {
+    "@id": `${SITE.url}/products/${p.slug}#product`,
+    name: p.name,
+    description: p.description,
+    image: `${SITE.url}/images/og-default.svg`,
+    brand: { "@type": "Brand", name: p.retailerName },
+    offers: {
+      "@type": "Offer",
+      url: `${SITE.url}/products/${p.slug}`,
+      priceCurrency: "KES",
+      price: p.priceKes ?? null,
+      priceValidUntil: p.priceLastChecked,
+      availability: p.availability === "in-stock" ? "https://schema.org/InStock" : "https://schema.org/MadeToOrder",
+      itemCondition: "https://schema.org/NewCondition",
+    },
+    category: p.category,
+    additionalProperty: p.materials.map((m) => ({ "@type": "PropertyValue", name: "material", value: m })),
+  };
+}
+
+function getRelatedProducts(product: { category: string; id: string }) {
+  return PRODUCTS.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 3);
+}
+
+function relatedGuides(productSlug: string) {
+  const direct = ARTICLES.filter((a) => a.relatedProductSlugs.includes(productSlug));
+  const fallback = ARTICLES.filter((a) => !direct.includes(a));
+  return [...direct, ...fallback].slice(0, 2);
+}
+
+function RelatedProductCard({ p }: { p: { id: string; slug: string; name: string; description: string; priceKes: number | null; priceOnRequest: boolean; images: string[] } }) {
+  return (
+    <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
+      <div className="relative h-40 overflow-hidden rounded-lg bg-cream-100">
+        <span className="image-placeholder absolute inset-0 flex items-center justify-center text-[0.75rem] font-medium uppercase tracking-wider">
+          {p.name}
+        </span>
+      </div>
+      <div className="p-4 flex-1 flex flex-col">
+        <h3 className="font-heading font-bold text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors">{p.name}</h3>
+        <div className="mt-auto flex items-baseline gap-2">
+          <Price amount={p.priceKes} onRequest={p.priceOnRequest} size="md" />
+        </div>
+        <Link href={`/products/${p.slug}`} className="mt-auto inline-flex items-center justify-center rounded-xl border border-border bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-cream-100 transition-colors focus-visible-ring w-full text-center">
+          View product
+        </Link>
+      </div>
+    </Card>
+  );
+}
 
 export const metadata = async ({ params }: { params: Promise<{ slug: string }> }) => {
   const { slug } = await params;
@@ -51,218 +104,185 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const reviews = getReviewsForProduct(product.name);
 
   return (
-    <div className="space-y-12">
-      <ProductTracker slug={product.slug} />
-      <JsonLd type="Product" data={productJsonLd(product)} />
-      <nav className="mb-2" aria-label="Breadcrumb">
-        <ol className="flex flex-wrap gap-2 text-xs text-muted">
-          <li><Link href="/discover" className="hover:text-primary transition-colors">Discover</Link></li>
-          <li><span aria-hidden="true">&rsaquo;</span><Link href={`/categories/${product.category}`} className="hover:text-primary transition-colors">{getCategory(product.category)?.name ?? product.category}</Link></li>
-          <li><span aria-hidden="true">&rsaquo;</span><span className="text-foreground">{product.name}</span></li>
-        </ol>
-      </nav>
-
-      <section className="grid lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-7 space-y-6">
-          <ProductImageGallery images={product.images} alt={product.name} />
-        </div>
-
-        <div className="lg:col-span-5 space-y-6">
-          <div>
-            {product.sponsored && <Badge variant="sponsor" className="mb-3">Featured Partner</Badge>}
-            <h1 className="font-heading text-3xl font-bold text-foreground">{product.name}</h1>
-            <p className="mt-2 text-sm text-muted">{product.retailerName}</p>
-            {reviews.length > 0 && (
-              <div className="mt-2">
-                <StarRating rating={averageRating(reviews) ?? 0} size="sm" count={reviews.length} />
-              </div>
-            )}
-          </div>
-
-          <Card className="rounded-2xl border border-border shadow-sm">
-            <CardHeader>
-              <CardTitle>Price</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-baseline gap-2">
-                <Price amount={product.priceKes} onRequest={product.priceOnRequest} size="lg" />
-                {!product.priceConfirmed && (
-                  <span className="text-xs text-warning font-semibold">Price may be outdated — confirm with retailer</span>
-                )}
-              </div>
-              <p className="text-xs text-muted">
-                Price last checked {new Date(product.priceLastChecked).toLocaleDateString("en-KE")}.
-                Prices can change — always confirm with the retailer before buying.
-              </p>
-              <PriceHistoryChart history={getPriceHistory(product.slug)} />
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl border border-border shadow-sm">
-            <CardHeader>
-              <CardTitle>Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex justify-between text-foreground">
-                <span className="text-muted">Availability</span>
-                <span className={`font-medium ${product.availability === "in-stock" ? "text-success" : "text-muted"}`}>
-                  {product.availability.replace("-", " ")}
-                </span>
-              </div>
-              <div className="flex justify-between text-foreground">
-                <span className="text-muted">Dimensions</span>
-                <span>{product.dimensions.widthCm} × {product.dimensions.depthCm} × {product.dimensions.heightCm} cm</span>
-              </div>
-              <div className="flex justify-between text-foreground">
-                <span className="text-muted">Materials</span>
-                <span className="line-clamp-1">{product.materials.join(", ")}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-2xl border border-border shadow-sm">
-            <CardHeader>
-              <CardTitle>Services &amp; contact</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className={`w-1.5 h-1.5 rounded-full ${product.delivery ? "bg-success" : "bg-muted"}`} aria-hidden="true" />
-                <span className="text-sm">{product.delivery ? "Delivery available" : "No delivery"}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`w-1.5 h-1.5 rounded-full ${product.assembly ? "bg-success" : "bg-muted"}`} aria-hidden="true" />
-                <span className="text-sm">{product.assembly ? "Assembly available" : "No assembly"}</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`w-1.5 h-1.5 rounded-full ${product.customization ? "bg-success" : "bg-muted"}`} aria-hidden="true" />
-                <span className="text-sm">{product.customization ? "Customisation available" : "No customisation"}</span>
-              </div>
-              {product.deliveryNotes && (
-                <p className="text-sm text-muted">{product.deliveryNotes}</p>
-              )}
-            </CardContent>
-          </Card>
-
-          <div className="space-y-3">
-            {retailer ? (
-              <>
-                <CallButton phone={retailer.phone} label="Call retailer" size="lg" className="w-full" />
-                <WhatsAppButton
-                  phone={retailer.whatsapp}
-                  message={`Hi, I found "${product.name}" on Nyumba Edit. Could you confirm the price, stock and delivery options?`}
-                  size="lg"
-                  className="w-full"
-                />
-                <SocialShare
-                  url={`${SITE.url}/products/${product.slug}`}
-                  title={product.name}
-                  message={`Hi, I found "${product.name}" (KSh ${product.priceKes?.toLocaleString("en-KE") ?? "Price on request"}) on Nyumba Edit. Could you confirm price and availability?`}
-                />
-                <div className="pt-1 flex items-center gap-2">
-                  <CompareToggle slug={product.slug} className="flex-1" />
-                  <SaveToggle slug={product.slug} className="flex-1" />
-                </div>
-              </>
-            ) : (
-              <p className="text-sm text-muted">No contact details available for this retailer.</p>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Description */}
-      <section className="section">
-        <h2 className="font-heading text-xl font-bold mb-4">About this product</h2>
-        <p className="text-muted leading-relaxed max-w-2xl">{product.description}</p>
-      </section>
-
-      {/* Reviews */}
-      <section aria-label={`Reviews for ${product.name}`}>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-heading text-xl font-bold">Customer reviews</h2>
-          <span className="text-xs text-muted">Demo data</span>
-        </div>
-        <RatingSummary reviews={reviews} />
-        <div className="mt-6">
-          <ReviewList reviews={reviews} />
-        </div>
-      </section>
-
-      {/* Related products */}
-      <section className="section rounded-2xl border border-border bg-cream-50 p-8">
-        <h2 className="font-heading text-xl font-bold mb-6">You may also like</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {getRelatedProducts(product).map((p) => (
-            <RelatedProductCard key={p.id} p={p} />
-          ))}
-        </div>
-      </section>
-
-      {/* Related guides */}
-      <section className="section">
-        <h2 className="font-heading text-xl font-bold mb-6">Related guides</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {relatedGuides(product.slug).map((a) => (
-            <Link key={a.id} href={`/guides/${a.slug}`} className="block rounded-xl border border-border bg-white p-5 hover:border-primary/60 transition-colors focus-visible-ring">
-              <span className="text-xs text-muted">{articleCategoryName(a.category)}</span>
-              <h3 className="font-heading font-bold text-foreground mb-2">{a.title}</h3>
-              <p className="text-sm text-muted line-clamp-2">{a.excerpt}</p>
+    <ErrorBoundary
+      fallback={
+        <div className="space-y-12">
+          <div className="rounded-2xl border border-terracotta-200 bg-terracotta-50 p-8 text-center">
+            <h2 className="font-bold text-terracotta-800">Unable to load product</h2>
+            <p className="mt-2 text-sm text-terracotta-700">
+              We encountered an error loading this product. Please try again later.
+            </p>
+            <Link
+              href="/discover"
+              className="mt-4 inline-flex items-center justify-center rounded-xl border border-terracotta-200 bg-white px-4 py-2 text-sm font-semibold text-terracotta-800 hover:bg-terracotta-50 transition-colors focus-visible-ring"
+            >
+              Browse products
             </Link>
-          ))}
+          </div>
         </div>
-      </section>
-    </div>
-  );
-}
+      }
+    >
+      <div className="space-y-12">
+        <ProductTracker slug={product.slug} />
+        <JsonLd type="Product" data={productJsonLd(product)} />
+        <nav className="mb-2" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap gap-2 text-xs text-muted">
+            <li><Link href="/discover" className="hover:text-primary transition-colors">Discover</Link></li>
+            <li><span aria-hidden="true">&rsaquo;</span><Link href={`/categories/${product.category}`} className="hover:text-primary transition-colors">{getCategory(product.category)?.name ?? product.category}</Link></li>
+            <li><span aria-hidden="true">&rsaquo;</span><span className="text-foreground">{product.name}</span></li>
+          </ol>
+        </nav>
 
-function getRelatedProducts(product: { category: string; id: string }) {
-  return PRODUCTS.filter((p) => p.id !== product.id && p.category === product.category).slice(0, 3);
-}
+        <section className="grid lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-7 space-y-6">
+            <ProductImageGallery images={product.images} alt={product.name} />
+          </div>
 
-function relatedGuides(productSlug: string) {
-  const direct = ARTICLES.filter((a) => a.relatedProductSlugs.includes(productSlug));
-  const fallback = ARTICLES.filter((a) => !direct.includes(a));
-  return [...direct, ...fallback].slice(0, 2);
-}
+          <div className="lg:col-span-5 space-y-6">
+            <div>
+              {product.sponsored && <Badge variant="sponsor" className="mb-3">Featured Partner</Badge>}
+              <h1 className="font-heading text-3xl font-bold text-foreground">{product.name}</h1>
+              <p className="mt-2 text-sm text-muted">{product.retailerName}</p>
+              {reviews.length > 0 && (
+                <div className="mt-2">
+                  <StarRating rating={averageRating(reviews) ?? 0} size="sm" count={reviews.length} />
+                </div>
+              )}
+            </div>
 
-function RelatedProductCard({ p }: { p: { id: string; slug: string; name: string; description: string; priceKes: number | null; priceOnRequest: boolean; images: string[] } }) {
-  return (
-    <Card className="flex flex-col h-full group hover:border-primary/60 transition-colors focus-visible-ring">
-      <div className="relative h-40 overflow-hidden rounded-lg bg-cream-100">
-        <span className="image-placeholder absolute inset-0 flex items-center justify-center text-[0.75rem] font-medium uppercase tracking-wider">
-          {p.name}
-        </span>
+            <Card className="rounded-2xl border border-border shadow-sm">
+              <CardHeader>
+                <CardTitle>Price</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex items-baseline gap-2">
+                  <Price amount={product.priceKes} onRequest={product.priceOnRequest} size="lg" />
+                  {!product.priceConfirmed && (
+                    <span className="text-xs text-warning font-semibold">Price may be outdated — confirm with retailer</span>
+                  )}
+                </div>
+                <p className="text-xs text-muted">
+                  Price last checked {new Date(product.priceLastChecked).toLocaleDateString("en-KE")}.
+                  Prices can change — always confirm with the retailer before buying.
+                </p>
+                <PriceHistoryChart history={getPriceHistory(product.slug)} />
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl border border-border shadow-sm">
+              <CardHeader>
+                <CardTitle>Details</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between text-foreground">
+                  <span className="text-muted">Availability</span>
+                  <span className={`font-medium ${product.availability === "in-stock" ? "text-success" : "text-muted"}`}>
+                    {product.availability.replace("-", " ")}
+                  </span>
+                </div>
+                <div className="flex justify-between text-foreground">
+                  <span className="text-muted">Dimensions</span>
+                  <span>{product.dimensions.widthCm} × {product.dimensions.depthCm} × {product.dimensions.heightCm} cm</span>
+                </div>
+                <div className="flex justify-between text-foreground">
+                  <span className="text-muted">Materials</span>
+                  <span className="line-clamp-1">{product.materials.join(", ")}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="rounded-2xl border border-border shadow-sm">
+              <CardHeader>
+                <CardTitle>Services & contact</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className={`w-1.5 h-1.5 rounded-full ${product.delivery ? "bg-success" : "bg-muted"}`} aria-hidden="true" />
+                  <span className="text-sm">{product.delivery ? "Delivery available" : "No delivery"}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`w-1.5 h-1.5 rounded-full ${product.assembly ? "bg-success" : "bg-muted"}`} aria-hidden="true" />
+                  <span className="text-sm">{product.assembly ? "Assembly available" : "No assembly"}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`w-1.5 h-1.5 rounded-full ${product.customization ? "bg-success" : "bg-muted"}`} aria-hidden="true" />
+                  <span className="text-sm">{product.customization ? "Customisation available" : "No customisation"}</span>
+                </div>
+                {product.deliveryNotes && (
+                  <p className="text-sm text-muted">{product.deliveryNotes}</p>
+                )}
+              </CardContent>
+            </Card>
+
+            <div className="space-y-3">
+              {retailer ? (
+                <>
+                  <CallButton phone={retailer.phone} label="Call retailer" size="lg" className="w-full" />
+                  <WhatsAppButton
+                    phone={retailer.whatsapp}
+                    message={`Hi, I found "${product.name}" on Nyumba Edit. Could you confirm the price, stock and delivery options?`}
+                    size="lg"
+                    className="w-full"
+                  />
+                  <SocialShare
+                    url={`${SITE.url}/products/${product.slug}`}
+                    title={product.name}
+                    message={`Hi, I found "${product.name}" (KSh ${product.priceKes?.toLocaleString("en-KE") ?? "Price on request"}) on Nyumba Edit. Could you confirm price and availability?`}
+                  />
+                  <div className="pt-1 flex items-center gap-2">
+                    <CompareToggle slug={product.slug} className="flex-1" />
+                    <SaveToggle slug={product.slug} className="flex-1" />
+                  </div>
+                </>
+              ) : (
+                <p className="text-sm text-muted">No contact details available for this retailer.</p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Description */}
+        <section className="section">
+          <h2 className="font-heading text-xl font-bold mb-4">About this product</h2>
+          <p className="text-muted leading-relaxed max-w-2xl">{product.description}</p>
+        </section>
+
+        {/* Reviews */}
+        <section aria-label={`Reviews for ${product.name}`}>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-heading text-xl font-bold">Customer reviews</h2>
+            <span className="text-xs text-muted">Demo data</span>
+          </div>
+          <RatingSummary reviews={reviews} />
+          <div className="mt-6">
+            <ReviewList reviews={reviews} />
+          </div>
+        </section>
+
+        {/* Related products */}
+        <section className="section rounded-2xl border border-border bg-cream-50 p-8">
+          <h2 className="font-heading text-xl font-bold mb-6">You may also like</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {getRelatedProducts(product).map((p) => (
+              <RelatedProductCard key={p.id} p={p} />
+            ))}
+          </div>
+        </section>
+
+        {/* Related guides */}
+        <section className="section">
+          <h2 className="font-heading text-xl font-bold mb-6">Related guides</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {relatedGuides(product.slug).map((a) => (
+              <Link key={a.id} href={`/guides/${a.slug}`} className="block rounded-xl border border-border bg-white p-5 hover:border-primary/60 transition-colors focus-visible-ring">
+                <span className="text-xs text-muted">{articleCategoryName(a.category)}</span>
+                <h3 className="font-heading font-bold text-foreground mb-2">{a.title}</h3>
+                <p className="text-sm text-muted line-clamp-2">{a.excerpt}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
-      <div className="p-4 flex-1 flex flex-col">
-        <h3 className="font-heading font-bold text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors">{p.name}</h3>
-        <div className="mt-auto flex items-baseline gap-2">
-          <Price amount={p.priceKes} onRequest={p.priceOnRequest} size="md" />
-        </div>
-        <Link href={`/products/${p.slug}`} className="mt-auto inline-flex items-center justify-center rounded-xl border border-border bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-cream-100 transition-colors focus-visible-ring w-full text-center">
-          View product
-        </Link>
-      </div>
-    </Card>
+    </ErrorBoundary>
   );
-}
-
-function productJsonLd(p: typeof PRODUCTS[number]) {
-  return {
-    "@id": `${SITE.url}/products/${p.slug}#product`,
-    name: p.name,
-    description: p.description,
-    image: `${SITE.url}/images/og-default.svg`,
-    brand: { "@type": "Brand", name: p.retailerName },
-    offers: {
-      "@type": "Offer",
-      url: `${SITE.url}/products/${p.slug}`,
-      priceCurrency: "KES",
-      price: p.priceKes ?? null,
-      priceValidUntil: p.priceLastChecked,
-      availability: p.availability === "in-stock" ? "https://schema.org/InStock" : "https://schema.org/MadeToOrder",
-      itemCondition: "https://schema.org/NewCondition",
-    },
-    category: p.category,
-    additionalProperty: p.materials.map((m) => ({ "@type": "PropertyValue", name: "material", value: m })),
-  };
 }

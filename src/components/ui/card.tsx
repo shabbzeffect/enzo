@@ -1,6 +1,8 @@
 "use strict";
 
 import * as React from "react";
+import Image from "next/image";
+import { getOptimizedImageUrl } from "@/lib/images";
 
 export type CardProps = React.HTMLAttributes<HTMLDivElement>;
 
@@ -26,15 +28,22 @@ export type CardImageProps = {
 };
 
 export function CardImage({ src, alt, height, className }: CardImageProps) {
+  const h = height ?? 240;
   return (
     <div
       className={[
-        "relative overflow-hidden rounded-xl bg-cream-100 image-placeholder",
+        "relative overflow-hidden rounded-xl bg-cream-100",
         className,
       ].filter(Boolean).join(" ")}
-      style={{ height: height ?? 240 }}
+      style={{ height: h }}
     >
-      <span>{alt}</span>
+      <Image
+        src={getOptimizedImageUrl(src, undefined, h, "medium")}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="object-cover transition-opacity duration-300"
+      />
     </div>
   );
 }

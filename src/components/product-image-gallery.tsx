@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { getImageUrl } from "@/lib/images";
+import { getImageUrl, getOptimizedImageUrl } from "@/lib/images";
 
 export type ProductImageGalleryProps = {
   images: string[];
@@ -71,7 +71,7 @@ export function ProductImageGallery({ images, alt, className }: ProductImageGall
               aria-pressed={selectedIndex === i}
             >
               <Image
-                src={getImageUrl(img)}
+                src={getOptimizedImageUrl(img, 64, 64, "medium")}
                 alt={`${alt} thumbnail ${i + 1}`}
                 fill
                 className="object-cover"

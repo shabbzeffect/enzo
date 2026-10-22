@@ -25,7 +25,21 @@ declare module "next-auth" {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "jwt",
+    maxAge: 60 * 60 * 8, // 8 hours
+  },
+  cookies: {
+    sessionToken: {
+      name: "__session",
+      options: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+      },
+    },
+  },
   pages: {
     signIn: "/admin/login",
     error: "/admin/login",

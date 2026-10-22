@@ -14,13 +14,6 @@ const NAV = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-warning-200 bg-warning-50 p-4 text-sm text-warning-800">
-        <strong className="font-semibold">Demo admin.</strong> Changes are stored in
-        process memory only — they reset when the server restarts and are not
-        shared between serverless invocations. Protect this area with real
-        authentication before production.
-      </div>
-
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-4">
         <nav aria-label="Admin" className="flex flex-wrap gap-1">
           {NAV.map((item) => (

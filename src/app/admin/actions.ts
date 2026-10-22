@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { signOut } from "@/auth";
 import { getStore } from "@/server/demo-store";
 import {
   addEnquiry as addEnquiryToStore,
@@ -25,8 +25,6 @@ import {
 } from "@/server/store-core";
 import { isValidEmail, isValidKenyanPhone, normalizeKenyanPhone } from "@/lib/validators";
 
-const ADMIN_SESSION_COOKIE = "nyumba_admin_session";
-
 function revalidateAll() {
   revalidatePath("/", "layout");
 }
@@ -36,9 +34,7 @@ function revalidateAll() {
 // ---------------------------------------------------------------------------
 
 export async function logoutAdmin() {
-  const cookieStore = await cookies();
-  cookieStore.delete(ADMIN_SESSION_COOKIE);
-  redirect("/admin/login");
+  await signOut({ redirectTo: "/admin/login" });
 }
 
 // ---------------------------------------------------------------------------

@@ -1,39 +1,39 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { COUNTIES, getRetailersByCounty, getProductsByCounty, averageRating, getReviewsByRetailer } from "@/lib/data/demo";
+import {
+  COUNTIES,
+  getRetailersByCounty,
+  getProductsByCounty,
+  CATEGORIES,
+} from "@/lib/data/demo";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge, SponsorLabel } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { Price } from "@/components/ui/price";
-import { StarRating } from "@/components/ui/rating";
+import { Button } from "@/components/ui/button";
 import { SITE } from "@/lib/site";
 
 type Params = { params: Promise<{ county: string }> };
 
-function countyFromSlug(slug: string) {
-  return COUNTIES.find(
+function countySlugToName(slug: string): string | null {
+  const matched = COUNTIES.find(
     (c) => c.name.toLowerCase().replace(/\s+/g, "-") === slug
   );
-}
-
-export async function generateStaticParams() {
-  return COUNTIES.map((c) => ({
-    county: c.name.toLowerCase().replace(/\s+/g, "-"),
-  }));
+  return matched?.name ?? null;
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { county: countySlug } = await params;
-  const county = countyFromSlug(countySlug);
-  if (!county) return { title: "Location | Nyumba Edit" };
-  const retailerCount = getRetailersByCounty(county.name).length;
-  const productCount = getProductsByCounty(county.name).length;
+  const countyName = countySlugToName(countySlug);
+  if (!countyName) return { title: "Location | Nyumba Edit" };
+  const retailers = getRetailersByCounty(countyName);
   return {
-    title: `Furniture in ${county.name}`,
-    description: `${retailerCount} furniture retailers and ${productCount} products in ${county.name}, Kenya. Browse stores, prices and contact details.`,
+    title: `Furniture retailers in ${countyName}`,
+    description: `Find ${retailers.length} furniture and homeware retailers in ${countyName}, Kenya. Browse products, compare prices and contact stores directly.`,
     openGraph: {
-      title: `Furniture in ${county.name} | Nyumba Edit`,
-      description: `${retailerCount} furniture retailers and ${productCount} products in ${county.name}, Kenya.`,
+      title: `Furniture retailers in ${countyName} | Nyumba Edit`,
+      description: `Browse ${retailers.length} retailers in ${countyName}.`,
+      type: "website",
       url: `${SITE.url}/locations/${countySlug}`,
     },
   };
@@ -41,92 +41,139 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function CountyPage({ params }: Params) {
   const { county: countySlug } = await params;
-  const county = countyFromSlug(countySlug);
-  if (!county) notFound();
+  const countyName = countySlugToName(countySlug);
 
-  const retailers = getRetailersByCounty(county.name);
-  const products = getProductsByCounty(county.name);
+  if (!countyName) notFound();
+
+  const retailers = getRetailersByCounty(countyName);
+  const products = getProductsByCounty(countyName);
+  const categorySlugs = Array.from(new Set(retailers.flatMap((r) => r.categories)));
+  const categoriesInCounty = categorySlugs
+    .map((slug) => CATEGORIES.find((c) => c.slug === slug))
+    .filter((c): c is (typeof CATEGORIES)[number] => Boolean(c));
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <nav aria-label="Breadcrumb">
         <ol className="flex flex-wrap gap-2 text-xs text-muted">
           <li>
             <Link href="/locations" className="hover:text-primary transition-colors">
-              Locations
+              All locations
             </Link>
           </li>
           <li aria-hidden="true">&rsaquo;</li>
-          <li className="text-foreground">{county.name}</li>
+          <li className="text-foreground">{countyName}</li>
         </ol>
       </nav>
 
-      <div>
-        <h1 className="font-heading text-2xl md:text-3xl font-bold">
-          Furniture in {county.name}
-        </h1>
-        <p className="mt-2 text-muted text-sm max-w-2xl">
-          {retailers.length} retailer{retailers.length === 1 ? "" : "s"} and{" "}
-          {products.length} product{products.length === 1 ? "" : "s"} listed in{" "}
-          {county.name}. All demo data.
-        </p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {county.towns.map((town) => (
-            <Badge key={town.slug} variant="subtle">
-              {town.name}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      <section aria-label="Retailers in this county">
-        <h2 className="font-heading text-xl font-bold mb-6">Retailers in {county.name}</h2>
-        {retailers.length === 0 ? (
-          <p className="text-sm text-muted">
-            No retailers listed in this county yet.{" "}
-            <Link href="/submit" className="text-primary hover:underline">
-              Know one? List it.
-            </Link>
+      <section>
+        <div className="rounded-2xl border border-border bg-cream-50 p-6 md:p-8">
+          <h1 className="font-heading text-2xl md:text-3xl font-bold text-foreground">
+            {countyName}
+          </h1>
+          <p className="mt-2 text-muted max-w-2xl">
+            {retailers.length} retailer{retailers.length === 1 ? "" : "s"} across{" "}
+            {new Set(retailers.map((r) => r.town)).size} town{new Set(retailers.map((r) => r.town)).size === 1 ? "" : "s"}.
           </p>
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+            <div>
+              <p className="text-muted">Retailers</p>
+              <p className="font-bold text-foreground text-xl">{retailers.length}</p>
+            </div>
+            <div>
+              <p className="text-muted">Products</p>
+              <p className="font-bold text-foreground text-xl">{products.length}</p>
+            </div>
+            <div>
+              <p className="text-muted">Categories</p>
+              <p className="font-bold text-foreground text-xl">
+                {categoriesInCounty.length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {categoriesInCounty.length > 0 && (
+        <section aria-label="Categories available in this county">
+          <h2 className="font-heading text-xl font-bold mb-4">
+            Categories available
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {categoriesInCounty.map((cat) => (
+              <Link
+                key={cat.slug}
+                href={`/discover?county=${encodeURIComponent(countyName)}&category=${cat.slug}`}
+                className="rounded-xl border border-border bg-white px-4 py-2 text-sm hover:border-primary/60 transition-colors focus-visible-ring"
+              >
+                {cat.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section aria-label={`Retailers in ${countyName}`}>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="font-heading text-xl font-bold">
+            Retailers in {countyName}
+          </h2>
+          <Link href="/retailers" className="text-sm font-semibold text-primary hover:underline">
+            All retailers &rarr;
+          </Link>
+        </div>
+        {retailers.length === 0 ? (
+          <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted">
+            No retailers listed in {countyName} yet.
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {retailers.map((r) => {
-              const reviews = getReviewsByRetailer(r.id);
-              const rating = averageRating(reviews);
-              return (
-                <Link
-                  key={r.id}
-                  href={`/retailers/${r.slug}`}
-                  className="group rounded-2xl border border-border bg-white p-5 hover:border-primary/60 transition-colors focus-visible-ring relative"
-                >
-                  {r.sponsored && (
-                    <SponsorLabel className="absolute -top-2 right-4">{r.sponsorLabel}</SponsorLabel>
-                  )}
-                  <h3 className="font-heading font-bold text-foreground group-hover:text-primary transition-colors">
-                    {r.name}
-                  </h3>
-                  <p className="mt-1 text-sm text-muted line-clamp-2">{r.shortDescription}</p>
-                  <div className="mt-3 flex items-center justify-between text-xs">
-                    <span className="font-semibold text-foreground">
-                      {r.town}, {r.county}
-                    </span>
-                    {rating !== null && <StarRating rating={rating} size="sm" count={reviews.length} />}
-                  </div>
-                </Link>
-              );
-            })}
+            {retailers.map((r) => (
+              <Link
+                key={r.id}
+                href={`/retailers/${r.slug}`}
+                className="group flex flex-col rounded-2xl border border-border bg-white p-5 hover:border-primary/60 transition-colors focus-visible-ring relative"
+              >
+                {r.sponsored && (
+                  <Badge variant="sponsor" className="absolute -top-2 right-4">
+                    {r.sponsorLabel}
+                  </Badge>
+                )}
+                <h3 className="font-heading font-bold text-foreground group-hover:text-primary transition-colors">
+                  {r.name}
+                </h3>
+                <p className="mt-1 text-sm text-muted line-clamp-2">
+                  {r.shortDescription}
+                </p>
+                <div className="mt-3 flex items-center justify-between text-xs">
+                  <span className="font-semibold text-foreground">
+                    {r.town}{r.area ? `, ${r.area}` : ""}
+                  </span>
+                  <span className="text-muted">
+                    {r.madeInKenya ? "Made in Kenya" : "Retailer"}
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </section>
 
-      {products.length > 0 && (
-        <section aria-label="Products in this county">
-          <h2 className="font-heading text-xl font-bold mb-6">
-            {products.length} product{products.length === 1 ? "" : "s"} in {county.name}
-          </h2>
+      <section aria-label={`Sample products from ${countyName}`}>
+        <h2 className="font-heading text-xl font-bold mb-6">
+          Sample products
+        </h2>
+        {products.length === 0 ? (
+          <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted">
+            No demo products from retailers in {countyName}.
+          </div>
+        ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((p) => (
-              <Card key={p.id} className="flex flex-col h-full group hover:border-primary/60 transition-colors">
+            {products.slice(0, 9).map((p) => (
+              <Card
+                key={p.id}
+                className="flex flex-col h-full group hover:border-primary/60 transition-colors"
+              >
                 <div className="relative h-40 overflow-hidden rounded-t-2xl bg-cream-100">
                   <span className="image-placeholder absolute inset-0 flex items-center justify-center text-[0.75rem] font-medium uppercase tracking-wider">
                     {p.name}
@@ -136,17 +183,58 @@ export default async function CountyPage({ params }: Params) {
                   <h3 className="font-heading font-bold text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                     <Link href={`/products/${p.slug}`}>{p.name}</Link>
                   </h3>
-                  <p className="mt-1 text-sm text-muted line-clamp-2 flex-1">{p.description}</p>
-                  <div className="mt-3">
+                  <p className="mt-1 text-sm text-muted line-clamp-2 flex-1">
+                    {p.description}
+                  </p>
+                  <div className="mt-3 flex items-baseline gap-2">
                     <Price amount={p.priceKes} onRequest={p.priceOnRequest} size="md" />
+                    {!p.priceConfirmed && (
+                      <span className="text-xs text-warning font-semibold">
+                        Price may be outdated
+                      </span>
+                    )}
                   </div>
-                  <div className="mt-2 text-xs text-muted">{p.retailerName}</div>
+                  <div className="mt-2 text-xs text-muted">
+                    <Link
+                      href={`/retailers/${p.retailerSlug}`}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {p.retailerName}
+                    </Link>
+                  </div>
+                  <div className="mt-auto pt-3">
+                    <Button size="sm" variant="outline" asChild className="w-full">
+                      <Link href={`/products/${p.slug}`}>View product</Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </section>
-      )}
+        )}
+        {products.length > 9 && (
+          <div className="mt-6 text-center">
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/discover?county=${encodeURIComponent(countyName)}`}>
+                View all {products.length} products
+              </Link>
+            </Button>
+          </div>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-border bg-cream-50 p-6 md:p-8">
+        <h2 className="font-heading text-lg font-bold mb-2">Looking for something specific?</h2>
+        <p className="text-sm text-muted max-w-2xl mb-4">
+          Use the discover page to search and filter products, retailers and guides
+          across {countyName}.
+        </p>
+        <Button asChild>
+          <Link href={`/discover?county=${encodeURIComponent(countyName)}`}>
+            Search in {countyName}
+          </Link>
+        </Button>
+      </section>
     </div>
   );
 }
